@@ -1,14 +1,16 @@
 "use client";
 import { EmailIcon, PasswordIcon } from "@/assets/icons";
-import Link from "next/link";
 import React, { useState } from "react";
 import InputGroup from "../FormElements/InputGroup";
-import { Checkbox } from "../FormElements/checkbox";
+import { useRouter } from "next/navigation";
+import { KeyRound, UserRound } from "lucide-react";
 
 export default function SigninWithPassword() {
+  const router = useRouter();
+
   const [data, setData] = useState({
-    email: process.env.NEXT_PUBLIC_DEMO_USER_MAIL || "",
-    password: process.env.NEXT_PUBLIC_DEMO_USER_PASS || "",
+    username: "Admin",
+    password: "Admin",
     remember: false,
   });
 
@@ -23,26 +25,30 @@ export default function SigninWithPassword() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    // You can remove this code block
     setLoading(true);
 
-    setTimeout(() => {
+    if (data.username === "Admin" && data.password === "Admin") {
+      setTimeout(() => {
+        setLoading(false);
+        router.push("/dashboard");
+      }, 1000);
+    } else {
       setLoading(false);
-    }, 1000);
+      alert("Invalid credentials");
+    }
   };
 
   return (
     <form onSubmit={handleSubmit}>
       <InputGroup
-        type="email"
-        label="Email"
+        type="text"
+        label="User Name"
         className="mb-4 [&_input]:py-[15px]"
-        placeholder="Enter your email"
-        name="email"
+        placeholder="Enter your user name"
+        name="username"
         handleChange={handleChange}
-        value={data.email}
-        icon={<EmailIcon />}
+        value={data.username}
+        icon={<UserRound />}
       />
 
       <InputGroup
@@ -53,31 +59,8 @@ export default function SigninWithPassword() {
         name="password"
         handleChange={handleChange}
         value={data.password}
-        icon={<PasswordIcon />}
+        icon={<KeyRound />}
       />
-
-      <div className="mb-6 flex items-center justify-between gap-2 py-2 font-medium">
-        <Checkbox
-          label="Remember me"
-          name="remember"
-          withIcon="check"
-          minimal
-          radius="md"
-          onChange={(e) =>
-            setData({
-              ...data,
-              remember: e.target.checked,
-            })
-          }
-        />
-
-        <Link
-          href="/auth/forgot-password"
-          className="hover:text-primary dark:text-white dark:hover:text-primary"
-        >
-          Forgot Password?
-        </Link>
-      </div>
 
       <div className="mb-4.5">
         <button
