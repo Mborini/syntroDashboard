@@ -12,47 +12,48 @@ export const authOptions: AuthOptions = {
       },
       async authorize(credentials) {
         const client = await pool.connect();
-        const query = `
-          SELECT u.id, u.username, u.password, r.name as role
-          FROM users u
-          JOIN roles r ON u.role_id = r.id
-          WHERE u.username = $1
-        `;
-        const result = await client.query(query, [credentials?.username]);
-        client.release();
+        try {
+          const query = `
+            SELECT u.id, u.username, u.password, r.name as role
+            FROM users u
+            JOIN roles r ON u.role_id = r.id
+            WHERE u.username = $1
+          `;
+          const result = await client.query(query, [credentials?.username]);
 
-        if (result.rows.length === 0) return null;
+          if (result.rows.length === 0) return null;
 
-        const user = result.rows[0];
+          const user = result.rows[0];
+          if (credentials?.password !== user.password) return null;
 
-        if (credentials?.password !== user.password) return null;
-
-        return { id: user.id, username: user.username, role: user.role };
+          return { id: user.id, username: user.username, role: user.role };
+        } finally {
+          client.release();
+        }
       },
     }),
   ],
   session: {
-    strategy: "jwt", // ✅ النوع الصحيح
+    strategy: "jwt",
   },
-callbacks: {
-  async jwt({ token, user }) {
-    if (user) {
-      token.id = user.id;
-      token.role = user.role;
-      token.username = user.username; // ✅ صح
-    }
-    return token;
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.username = user.username   ;
+        token.role = user.role;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string;
+        session.user.username = token.username as string;
+        session.user.role = token.role as string;
+      }
+      return session;
+    },
   },
-  async session({ session, token }) {
-    if (session.user) {
-      session.user.id = token.id as string;
-      session.user.role = token.role as string;
-      session.user.name = token.username as string; // ✅ صح
-    }
-    return session;
-  },
-},
-
 };
 
 const handler = NextAuth(authOptions);
