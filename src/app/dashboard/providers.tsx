@@ -3,7 +3,7 @@
 
 import { SidebarProvider } from "@/components/Layouts/sidebar/sidebar-context";
 import { AuthProvider } from "./auth-provider";
-
+import "@/lib/i18n";
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <AuthProvider>
