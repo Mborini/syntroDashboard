@@ -21,7 +21,7 @@ export default function SignIn() {
 
           <div className="hidden w-full p-7.5 xl:block xl:w-1/2">
             <div className="custom-gradient-1 overflow-hidden rounded-2xl px-12.5 pt-12.5 dark:!bg-dark-2 dark:bg-none">
-              <div className="mb-5 flex items-center gap-5">
+              <div className=" flex items-center gap-5">
                 <Image
                   src={"/images/logo/logo.png"}
                   alt="Logo"
@@ -38,7 +38,7 @@ export default function SignIn() {
                 fields below
               </p>
 
-              <div className="mt-31">
+              <div >
                 <Image
                   src={"/images/grids/grid-02.svg"}
                   alt="Logo"

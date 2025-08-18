@@ -1,0 +1,9 @@
+{
+  "home": {
+    "title": "Home",
+    "description": "Welcome to our dashboard. Here you can manage everything easily.",
+    "welcomeMessage": "Welcome to our dashboard!",
+  "settings": "Account Settings"
+
+  }
+}
