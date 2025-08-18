@@ -33,7 +33,7 @@ export function UserInfo() {
         <figure className="flex items-center gap-3">
           <ShieldUser className="size-10 place-items-center rounded-full border bg-gray-2 p-2 text-dark outline-none hover:text-primary focus-visible:border-primary focus-visible:text-primary dark:border-dark-4 dark:bg-dark-3 dark:text-white dark:focus-visible:border-primary" />
           <figcaption className="flex items-center gap-1 font-medium text-dark dark:text-dark-6 max-[1024px]:sr-only">
-            <span>{session?.user?.name}</span>
+            <span>{session?.user?.username}</span>
 
             <ChevronUpIcon
               aria-hidden
@@ -65,7 +65,7 @@ export function UserInfo() {
 
           <figcaption className="space-y-1 text-base font-medium">
             <div className="mb-2 leading-none text-dark dark:text-white">
-              {session?.user?.name}
+              {session?.user?.username} 
             </div>
 
             <div className="leading-none text-gray-6">

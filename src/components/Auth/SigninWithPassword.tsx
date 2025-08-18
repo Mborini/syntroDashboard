@@ -27,13 +27,12 @@ export default function SigninWithPassword() {
       });
 
       if (result?.ok) {
-        console.log("✅ Logged in");
+      
         router.push("/dashboard"); // أو أي صفحة محمية
       } else {
         alert(result?.error || "Invalid credentials");
       }
     } catch (err) {
-      console.error("❌ Login error:", err);
       alert("Something went wrong");
     } finally {
       setLoading(false);
