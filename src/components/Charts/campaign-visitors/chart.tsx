@@ -13,7 +13,7 @@ type PropsType = {
 const Chart = dynamic(() => import("react-apexcharts"), {
   ssr: false,
 });
-
+ 
 export function CampaignVisitorsChart({ data }: PropsType) {
   const options: ApexOptions = {
     colors: ["#5750F1"],
