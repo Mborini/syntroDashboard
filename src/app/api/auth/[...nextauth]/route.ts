@@ -1,8 +1,9 @@
+// src/app/api/auth/[...nextauth]/route.ts
 import NextAuth, { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import pool from "@/lib/db";
 
-export const authOptions: AuthOptions = {
+const authOptions: AuthOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -26,22 +27,20 @@ export const authOptions: AuthOptions = {
           const user = result.rows[0];
           if (credentials?.password !== user.password) return null;
 
-          return { id: user.id, username: user.username, role: user.role };
+          return { id: user.id, username: user.username, role: user.role } as any;
         } finally {
           client.release();
         }
       },
     }),
   ],
-  session: {
-    strategy: "jwt",
-  },
+  session: { strategy: "jwt" },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
-        token.username = user.username   ;
-        token.role = user.role;
+        token.id = (user as any).id;
+        token.username = (user as any).username;
+        token.role = (user as any).role;
       }
       return token;
     },
