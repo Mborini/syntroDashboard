@@ -1,11 +1,12 @@
 "use client";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { KeyRound, UserRound } from "lucide-react";
 import InputGroup from "../FormElements/InputGroup";
-import { redirect } from "next/dist/client/components/redirect";
 
 export default function SigninWithPassword() {
+  const router = useRouter();
   const [formData, setFormData] = useState({ username: "", password: "" });
   const [loading, setLoading] = useState(false);
 
@@ -26,7 +27,8 @@ export default function SigninWithPassword() {
       });
 
       if (result?.ok) {
-      redirect("/dashboard"); // إعادة التوجيه إلى صفحة لوحة التحكم
+      
+        router.push("/dashboard"); // أو أي صفحة محمية
       } else {
         alert(result?.error || "Invalid credentials");
       }
