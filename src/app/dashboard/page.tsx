@@ -10,8 +10,8 @@ import { OverviewCardsGroup } from "./(home)/_components/overview-cards";
 import { OverviewCardsSkeleton } from "./(home)/_components/overview-cards/skeleton";
 import { RegionLabels } from "./(home)/_components/region-labels";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
+import { authOptions } from "@/lib/authOptions";
 
 type PropsType = {
   searchParams: Promise<{
