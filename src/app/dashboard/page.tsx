@@ -4,7 +4,7 @@ import { WeeksProfit } from "@/components/Charts/weeks-profit";
 import { TopChannels } from "@/components/Tables/top-channels";
 import { TopChannelsSkeleton } from "@/components/Tables/top-channels/skeleton";
 import { createTimeFrameExtractor } from "@/utils/timeframe-extractor";
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { ChatsCard } from "./(home)/_components/chats-card";
 import { OverviewCardsGroup } from "./(home)/_components/overview-cards";
 import { OverviewCardsSkeleton } from "./(home)/_components/overview-cards/skeleton";
@@ -21,9 +21,11 @@ type PropsType = {
 
 export default async function Home({ searchParams }: PropsType) {
   const { selected_time_frame } = await searchParams;
+ 
   const extractTimeFrame = createTimeFrameExtractor(selected_time_frame);
-const session = await getServerSession(authOptions);
-  if (!session) redirect("/"); 
+  const session = await getServerSession(authOptions);
+  if (!session) redirect("/");
+ 
   return (
     <>
       <Suspense fallback={<OverviewCardsSkeleton />}>

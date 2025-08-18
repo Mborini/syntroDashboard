@@ -42,12 +42,12 @@ export const NAV_DATA = [
       },
       {
         title: "Tables",
-        url: "/tables",
+        url: "dashboard/tables",
         icon: Icons.Table,
         items: [
           {
             title: "Tables",
-            url: "/tables",
+            url: "dashboard/tables",
           },
         ],
       },
