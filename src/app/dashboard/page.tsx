@@ -1,8 +1,7 @@
 import { PaymentsOverview } from "@/components/Charts/payments-overview";
 import { UsedDevices } from "@/components/Charts/used-devices";
 import { WeeksProfit } from "@/components/Charts/weeks-profit";
-import { TopChannels } from "@/components/Tables/top-channels";
-import { TopChannelsSkeleton } from "@/components/Tables/top-channels/skeleton";
+import { UsersTable } from "@/components/Users";
 import { createTimeFrameExtractor } from "@/utils/timeframe-extractor";
 import { Suspense, useEffect, useState } from "react";
 import { ChatsCard } from "./(home)/_components/chats-card";
@@ -21,11 +20,11 @@ type PropsType = {
 
 export default async function Home({ searchParams }: PropsType) {
   const { selected_time_frame } = await searchParams;
- 
   const extractTimeFrame = createTimeFrameExtractor(selected_time_frame);
   const session = await getServerSession(authOptions);
+  
   if (!session) redirect("/");
- 
+
   return (
     <>
       <Suspense fallback={<OverviewCardsSkeleton />}>
@@ -54,9 +53,7 @@ export default async function Home({ searchParams }: PropsType) {
         <RegionLabels />
 
         <div className="col-span-12 grid xl:col-span-8">
-          <Suspense fallback={<TopChannelsSkeleton />}>
-            <TopChannels />
-          </Suspense>
+          <UsersTable />
         </div>
 
         <Suspense fallback={null}>

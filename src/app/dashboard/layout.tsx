@@ -2,8 +2,15 @@
 import { Sidebar } from "@/components/Layouts/sidebar";
 import { Header } from "@/components/Layouts/header";
 import type { PropsWithChildren } from "react";
+import { getServerSession } from "next-auth/next";
+import { redirect } from "next/navigation";
+import { authOptions } from "@/lib/authOptions";
 
-export default function DashboardLayout({ children }: PropsWithChildren) {
+export default async function DashboardLayout({ children }: PropsWithChildren) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) redirect("/");
+
   return (
     <div className="flex min-h-screen">
       <Sidebar />

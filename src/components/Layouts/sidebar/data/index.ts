@@ -1,5 +1,5 @@
 import * as Icons from "../icons";
-
+import { User2Icon, UserCog } from "lucide-react";
 export const NAV_DATA = [
   {
     label: "MAIN MENU",
@@ -23,7 +23,13 @@ export const NAV_DATA = [
       {
         title: "Profile",
         url: "/profile",
-        icon: Icons.User,
+        icon: User2Icon,
+        items: [],
+      },
+      {
+        title: "Users",
+            url: "/dashboard/users", // ← مسار يبدأ بـ "/"
+        icon: UserCog,
         items: [],
       },
       {
