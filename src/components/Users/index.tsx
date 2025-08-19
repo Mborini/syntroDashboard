@@ -1,31 +1,14 @@
 "use client";
 
-import { TrashIcon } from "@/assets/icons";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { EyeIcon, PencilIcon } from "lucide-react";
+import { EyeIcon, PencilIcon, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { TableSkeleton } from "../Common/skeleton";
 
-type User = {
-  id: number;
-  name: string;
-  email: string;
-  role: string;
-};
-
 export function UsersTable() {
-  
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
 
-   useEffect(() => {
+  useEffect(() => {
     const fetchUsers = async () => {
       try {
         const response = await fetch("/api/users");
@@ -41,53 +24,62 @@ export function UsersTable() {
     fetchUsers();
   }, []);
 
-  if (loading) return <TableSkeleton columns={3} />; 
-
+  if (loading) return <TableSkeleton columns={3} />;
 
   return (
-    <div className="rounded-[10px] border border-stroke bg-white p-4 shadow-1 dark:border-dark-3 dark:bg-gray-dark dark:shadow-card sm:p-7.5">
-      <Table>
-        <TableHeader>
-          <TableRow className="border-none bg-[#F7F9FC] dark:bg-dark-2 [&>th]:py-4 [&>th]:text-base [&>th]:text-dark [&>th]:dark:text-white">
-            <TableHead className="min-w-[155px] xl:pl-7.5">Name</TableHead>
-            <TableHead>Role</TableHead>
-            <TableHead className="text-right xl:pr-7.5">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-
-        <TableBody>
-          {users.map((user: any, index: number) => (
-            <TableRow key={index} className="border-[#eee] dark:border-dark-3">
-              <TableCell className="min-w-[155px] xl:pl-7.5">
-                <h5 className="text-dark dark:text-white">{user.username}</h5>
-              </TableCell>
-
-              <TableCell>
-                <p className="text-dark dark:text-white">{user.role}</p>
-              </TableCell>
-
-              <TableCell className="xl:pr-7.5">
-                <div className="flex items-center justify-end gap-x-3.5">
-                  <button className="hover:text-primary">
+    <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white p-4 shadow-md dark:border-gray-700 dark:bg-gray-800 sm:p-6">
+      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <thead className="bg-gray-50 dark:bg-gray-700">
+          <tr>
+            <th
+              scope="col"
+              className="px-6 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-200"
+            >
+              Name
+            </th>
+            <th
+              scope="col"
+              className="px-6 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-200"
+            >
+              Role
+            </th>
+            <th
+              scope="col"
+              className="px-6 py-3 text-right text-sm font-medium text-gray-700 dark:text-gray-200"
+            >
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+          {users.map((user) => (
+            <tr key={user.id} className="hover:bg-gray-100 dark:hover:bg-gray-700">
+              <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
+                {user.username}
+              </td>
+              <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
+                {user.role}
+              </td>
+              <td className="px-6 py-4 text-sm font-medium text-right">
+                <div className="flex justify-end gap-3">
+                  <button className="text-gray-500 hover:text-blue-500">
                     <span className="sr-only">View User</span>
-                    <EyeIcon className="size-5" />
+                    <EyeIcon className="h-5 w-5" />
                   </button>
-
-                  <button className="hover:text-orange-400">
+                  <button className="text-gray-500 hover:text-orange-400">
                     <span className="sr-only">Edit User</span>
-                    <PencilIcon className="size-5" />
+                    <PencilIcon className="h-5 w-5" />
                   </button>
-
-                  <button className="hover:text-red-dark">
+                  <button className="text-gray-500 hover:text-red-600">
                     <span className="sr-only">Delete User</span>
-                    <TrashIcon />
+                    <Trash2 className="h-5 w-5" />
                   </button>
                 </div>
-              </TableCell>
-            </TableRow>
+              </td>
+            </tr>
           ))}
-        </TableBody>
-      </Table>
+        </tbody>
+      </table>
     </div>
   );
 }

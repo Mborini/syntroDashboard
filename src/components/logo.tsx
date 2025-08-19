@@ -1,28 +1,17 @@
-import darkLogo from "@/assets/logos/dark.svg";
+// Logo.tsx
 import Image from "next/image";
 
 export function Logo() {
   return (
-    <div className="relative h-14 max-w-[10.847rem]">
+    <div className="flex justify-center items-center">
       <Image
-        src={"/images/logo/logo1.png"}
-        width={176}
-        height={32}
-        className="dark:hidden"
-        alt="NextAdmin logo"
+        src="/images/logo/logo.png"
+        width={130}
+        height={50}
+        alt="syntro logo"
         role="presentation"
         quality={100}
-       
-      />
-
-      <Image
-        src={"/images/logo/logo1.png"}
-        fill
-        className="hidden dark:block"
-        alt="NextAdmin logo"
-        role="presentation"
-        quality={100}
-      />
+      />    
     </div>
   );
 }

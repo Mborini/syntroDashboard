@@ -10,7 +10,7 @@ export const NAV_DATA = [
         items: [
           {
             title: "eCommerce",
-            url: "/",
+            url: "/dashboard/ecommerce",
           },
         ],
       },
@@ -22,13 +22,13 @@ export const NAV_DATA = [
       },
       {
         title: "Profile",
-        url: "/profile",
+        url: "/dashboard/profile",
         icon: User2Icon,
         items: [],
       },
       {
         title: "Users",
-            url: "/dashboard/users", // ← مسار يبدأ بـ "/"
+            url: "/dashboard/users",
         icon: UserCog,
         items: [],
       },
@@ -38,22 +38,11 @@ export const NAV_DATA = [
         items: [
           {
             title: "Form Elements",
-            url: "/forms/form-elements",
+            url: "/dashboard/forms/form-elements",
           },
           {
             title: "Form Layout",
-            url: "/forms/form-layout",
-          },
-        ],
-      },
-      {
-        title: "Tables",
-        url: "dashboard/tables",
-        icon: Icons.Table,
-        items: [
-          {
-            title: "Tables",
-            url: "dashboard/tables",
+            url: "/dashboard/forms/form-layout",
           },
         ],
       },
@@ -63,7 +52,7 @@ export const NAV_DATA = [
         items: [
           {
             title: "Settings",
-            url: "/pages/settings",
+            url: "/dashboard/pages/settings",
           },
         ],
       },
@@ -78,7 +67,7 @@ export const NAV_DATA = [
         items: [
           {
             title: "Basic Chart",
-            url: "/charts/basic-chart",
+            url: "/dashboard/charts/basic-chart",
           },
         ],
       },
@@ -88,11 +77,11 @@ export const NAV_DATA = [
         items: [
           {
             title: "Alerts",
-            url: "/ui-elements/alerts",
+            url: "/dashboard/ui-elements/alerts",
           },
           {
             title: "Buttons",
-            url: "/ui-elements/buttons",
+            url: "/dashboard/ui-elements/buttons",
           },
         ],
       },
@@ -102,7 +91,7 @@ export const NAV_DATA = [
         items: [
           {
             title: "Sign In",
-            url: "/auth/sign-in",
+            url: "/dashboard/auth/sign-in",
           },
         ],
       },
