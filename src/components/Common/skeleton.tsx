@@ -13,7 +13,7 @@ interface TableSkeletonProps {
   rows?: number;
 }
 
-export function TableSkeleton({ columns, rows = 5 }: TableSkeletonProps) {
+export function TableSkeleton({ columns = 3, rows = 5 }: TableSkeletonProps) {
   return (
     <div className="rounded-[10px] bg-white px-7.5 pb-4 pt-7.5 shadow-1 dark:bg-gray-dark dark:shadow-card">
       <Table>
@@ -29,7 +29,10 @@ export function TableSkeleton({ columns, rows = 5 }: TableSkeletonProps) {
 
         <TableBody>
           {Array.from({ length: rows }).map((_, rowIndex) => (
-            <TableRow key={rowIndex} className="border-[#eee] dark:border-dark-3">
+            <TableRow
+              key={rowIndex}
+              className="border-[#eee] dark:border-dark-3"
+            >
               {Array.from({ length: columns }).map((_, colIndex) => (
                 <TableCell key={colIndex}>
                   <Skeleton className="h-6 w-full" />

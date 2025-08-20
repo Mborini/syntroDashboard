@@ -1,7 +1,6 @@
 import { PaymentsOverview } from "@/components/Charts/payments-overview";
 import { UsedDevices } from "@/components/Charts/used-devices";
 import { WeeksProfit } from "@/components/Charts/weeks-profit";
-import { UsersTable } from "@/components/Users";
 import { createTimeFrameExtractor } from "@/utils/timeframe-extractor";
 import { Suspense, useEffect, useState } from "react";
 import { ChatsCard } from "./(home)/_components/chats-card";
@@ -11,6 +10,7 @@ import { RegionLabels } from "./(home)/_components/region-labels";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/authOptions";
 import { redirect } from "next/dist/client/components/redirect";
+import { UsersTable } from "@/components/Users/Table";
 
 type PropsType = {
   searchParams: Promise<{
