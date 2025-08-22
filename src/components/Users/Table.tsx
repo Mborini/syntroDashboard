@@ -1,6 +1,13 @@
 "use client";
-import { Badge } from "@mantine/core";
 
+import {
+  Badge,
+  Table,
+  Button,
+  Group,
+  ActionIcon,
+  ScrollArea,
+} from "@mantine/core";
 import {
   PencilIcon,
   Trash2,
@@ -9,11 +16,19 @@ import {
   UserRoundX,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+
 import { UserDrawer } from "./UserDrawer";
-import { User } from "@/types/user";
-import { Table, Button, Group, ActionIcon, ScrollArea } from "@mantine/core";
 import { TableSkeleton } from "../Common/skeleton";
 import ConfirmModal from "../Common/ConfirmModal";
+import {
+  getUsers,
+  createUser,
+  updateUser,
+  deleteUser,
+  toggleUserStatus,
+} from "@/services/userServices";
+import { CreateUserDTO, UpdateUserDTO, User } from "@/types/user";
+import { Toast } from "@/lib/toast";
 
 export function UsersTable() {
   const [users, setUsers] = useState<User[]>([]);
@@ -22,44 +37,98 @@ export function UsersTable() {
   const [drawerOpened, setDrawerOpened] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
-  const [deleteUser, setDeleteUser] = useState<User | null>(null);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const [modalOpened, setModalOpened] = useState(false);
+  const [statusUser, setStatusUser] = useState<User | null>(null);
+  const [statusModalOpened, setStatusModalOpened] = useState(false);
+
+  const handleToggleStatusClick = (user: User) => {
+    setStatusUser(user);
+    setStatusModalOpened(true);
+  };
+
+  const handleConfirmToggleStatus = async () => {
+    if (statusUser) {
+      try {
+        const updatedUser = await toggleUserStatus(
+          statusUser.id,
+          !statusUser.isActive,
+        );
+        setUsers((prev) =>
+          prev.map((u) =>
+            u.id === updatedUser.id
+              ? { ...updatedUser, role: u.role }
+              : u,
+          ),
+        );
+        Toast.success("User status changed successfully");
+      } catch (error) {
+        console.error("Failed to toggle user status:", error);
+        Toast.error("Failed to change user status");
+      } finally {
+        setStatusUser(null);
+        setStatusModalOpened(false);
+      }
+    }
+  };
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    async function loadUsers() {
+      setLoading(true);
       try {
-        const response = await fetch("/api/users");
-        const data = await response.json();
+        const data = await getUsers();
         setUsers(data);
       } catch (error) {
-        console.error(error);
+        console.error("Failed to fetch users:", error);
       } finally {
         setLoading(false);
       }
-    };
-
-    fetchUsers();
+    }
+    loadUsers();
   }, []);
 
-  const handleSubmit = (data: User) => {
-    if (selectedUser) {
-      setUsers((prev) =>
-        prev.map((u) => (u === selectedUser ? { ...u, ...data } : u)),
-      );
-    } else {
-      setUsers((prev) => [...prev, data]);
+  const handleSubmit = async (data: CreateUserDTO | UpdateUserDTO) => {
+    try {
+      if (selectedUser) {
+        // update
+        await updateUser(selectedUser.id, data);
+
+        // إعادة جلب جميع المستخدمين بعد التعديل
+        const refreshedUsers = await getUsers();
+        setUsers(refreshedUsers);
+        Toast.success("User updated successfully");
+      } else {
+        // create
+        await createUser(data as CreateUserDTO);
+        // إعادة جلب جميع المستخدمين بعد الإضافة
+        const refreshedUsers = await getUsers();
+        setUsers(refreshedUsers);
+        Toast.success("User created successfully");
+      }
+      setDrawerOpened(false);
+    } catch (error) {
+      Toast.error("Failed to save user");
+      console.error("Failed to save user:", error);
     }
   };
 
   const handleDeleteClick = (user: User) => {
-    setDeleteUser(user);
+    setUserToDelete(user);
     setModalOpened(true);
   };
 
-  const handleConfirmDelete = () => {
-    if (deleteUser) {
-      setUsers((prev) => prev.filter((u) => u !== deleteUser));
-      setDeleteUser(null);
+  const handleConfirmDelete = async () => {
+    if (userToDelete) {
+      try {
+        await deleteUser(userToDelete.id);
+        setUsers((prev) => prev.filter((u) => u.id !== userToDelete.id));
+        setUserToDelete(null);
+        setModalOpened(false);
+        Toast.success("User deleted successfully");
+      } catch (error) {
+        console.error("Failed to delete user:", error);
+        Toast.error("Failed to delete user");
+      }
     }
   };
 
@@ -84,7 +153,7 @@ export function UsersTable() {
 
       <ScrollArea>
         <div className="flex justify-center">
-          <Table className="w-full rounded-lg bg-white text-center shadow-md">
+          <Table className="w-full rounded-lg bg-white text-center shadow-md dark:bg-gray-dark dark:shadow-card">
             <Table.Thead>
               <Table.Tr className="h-12 align-middle">
                 <Table.Th className="text-center align-middle">Name</Table.Th>
@@ -98,10 +167,10 @@ export function UsersTable() {
 
             <Table.Tbody>
               {users.map((user) => (
-                <Table.Tr key={user.username} className="h-12 align-middle">
-                  <Table.Td className="align-middle">{user.username}</Table.Td>
-                  <Table.Td className="align-middle">{user.role}</Table.Td>
-                  <Table.Td className="align-middle">
+                <Table.Tr key={user.id} className="h-12 align-middle">
+                  <Table.Td>{user.username}</Table.Td>
+                  <Table.Td>{user.role}</Table.Td>
+                  <Table.Td>
                     <Group className="justify-center">
                       {user.isActive ? (
                         <Badge variant="light" color="green">
@@ -114,15 +183,20 @@ export function UsersTable() {
                       )}
                     </Group>
                   </Table.Td>
-                  <Table.Td className="align-middle">
-                    <Group className="flex justify-center align-middle">
-                      <ActionIcon variant="subtle" color="blue">
+                  <Table.Td>
+                    <Group className="flex justify-center">
+                      <ActionIcon
+                        variant="subtle"
+                        color={user.isActive ? "red" : "green"}
+                        onClick={() => handleToggleStatusClick(user)}
+                      >
                         {user.isActive ? (
-                          <UserRoundX size={16} />
+                          <UserRoundX  size={16} />
                         ) : (
-                          <UserCheck size={16} />
+                          <UserCheck  size={16} />
                         )}
                       </ActionIcon>
+
                       <ActionIcon
                         variant="subtle"
                         color="orange"
@@ -155,6 +229,14 @@ export function UsersTable() {
         user={selectedUser}
         onSubmit={handleSubmit}
       />
+      <ConfirmModal
+        opened={statusModalOpened}
+        onClose={() => setStatusModalOpened(false)}
+        onConfirm={handleConfirmToggleStatus}
+        title="Change User Status"
+        message={`Are you sure you want to ${statusUser?.isActive ? "deactivate" : "activate"} this user?`}
+        color={statusUser?.isActive ? "red" : "green"}
+      />
 
       <ConfirmModal
         opened={modalOpened}
@@ -162,6 +244,7 @@ export function UsersTable() {
         onConfirm={handleConfirmDelete}
         title="Delete User"
         message="Are you sure you want to delete this user?"
+        color="red"
       />
     </>
   );

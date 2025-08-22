@@ -11,8 +11,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <MantineProvider>
       <AuthProvider>
-        <SidebarProvider>{children}</SidebarProvider>
-        </AuthProvider>
+        <SidebarProvider>
+          {children}
+        </SidebarProvider>
+      </AuthProvider>
     </MantineProvider>
   );
 }

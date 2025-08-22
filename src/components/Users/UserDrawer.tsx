@@ -1,8 +1,21 @@
 "use client";
 
-import { User, UserDrawerProps } from "@/types/user";
-import { Drawer, TextInput, Button } from "@mantine/core";
-import { useState } from "react";
+import { Toast } from "@/lib/toast";
+import {
+  CreateUserDTO,
+  FormUser,
+  UpdateUserDTO,
+  User,
+  UserDrawerProps,
+} from "@/types/user";
+import { Drawer, TextInput, Button, Select } from "@mantine/core";
+import { useState, useEffect } from "react";
+import { AppButton } from "../ui-elements/button";
+
+interface Role {
+  id: number;
+  name: string;
+}
 
 export function UserDrawer({
   opened,
@@ -10,61 +23,102 @@ export function UserDrawer({
   user,
   onSubmit,
 }: UserDrawerProps) {
-  const [form, setForm] = useState<User>(user || { username: "", role: "" });
+  const [form, setForm] = useState<FormUser>({
+    username: "",
+    role_id: undefined,
+    isActive: true,
+    password: "",
+  });
+  const [roles, setRoles] = useState<Role[]>([]);
+
+  useEffect(() => {
+    if (user) {
+      setForm({
+        username: user.username,
+        role_id: (user as any).role_id,
+        isActive: user.isActive,
+      });
+    } else {
+      setForm({
+        username: "",
+        role_id: undefined,
+        isActive: true,
+        password: "",
+      });
+    }
+
+    // fetch roles
+    async function loadRoles() {
+      try {
+        const res = await fetch("/api/roles");
+        const data: Role[] = await res.json();
+        setRoles(data);
+      } catch (error) {
+        console.error("Failed to load roles", error);
+      }
+    }
+    loadRoles();
+  }, [user, opened]);
 
   const handleSubmit = () => {
-    onSubmit(form);
+    if (!form.role_id) return Toast.error("Please select a role!");
+    onSubmit(form as CreateUserDTO | UpdateUserDTO);
     onClose();
   };
 
   return (
     <Drawer
+      bg={"red"}
       opened={opened}
       onClose={onClose}
       position="right"
-      overlayProps={{ backgroundOpacity: 0.5, blur: 2 }}
       size="sm"
       title={user ? "Edit User" : "Add User"}
     >
       <div className="flex flex-col gap-4">
         <TextInput
-          label="Username"
           radius={"md"}
+          label="Username"
           placeholder="Enter username"
           value={form.username}
           onChange={(e) =>
             setForm({ ...form, username: e.currentTarget.value })
           }
-          className="!text-sm"
         />
-        <TextInput
-          label="Role"
+
+        <Select
           radius={"md"}
-          placeholder="Enter role"
-          value={form.role}
-          onChange={(e) => setForm({ ...form, role: e.currentTarget.value })}
-          className="!text-sm"
+          label="Role"
+          placeholder="Select role"
+          value={form.role_id?.toString()}
+          onChange={(val) => setForm({ ...form, role_id: Number(val) })}
+          data={roles.map((r) => ({ value: r.id.toString(), label: r.name }))}
         />
-        <div className="mt-4 flex justify-center">
-          <Button
+
+        {!user && (
+          <TextInput
+            label="Password"
             radius={"md"}
-            w={"50%"}
-            variant="light"
-            onClick={handleSubmit}
+            placeholder="Enter password"
+            type="password"
+            value={form.password}
+            onChange={(e) =>
+              setForm({ ...form, password: e.currentTarget.value })
+            }
+          />
+        )}
+
+        <div className="mt-4 flex justify-center gap-2">
+          <AppButton
             color={user ? "orange" : "green"}
+            onClick={handleSubmit}
+            fullWidth
           >
             {user ? "Update" : "Create"}
-          </Button>
-          <Button
-            radius={"md"}
-            w={"50%"}
-            variant="light"
-            color="red"
-            onClick={onClose}
-            className="ml-2"
-          >
+          </AppButton>
+          <AppButton color="red" onClick={onClose} fullWidth>
             Cancel
-          </Button>
+          </AppButton>
         </div>
       </div>
     </Drawer>
