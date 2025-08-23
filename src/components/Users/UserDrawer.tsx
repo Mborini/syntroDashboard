@@ -26,7 +26,7 @@ export function UserDrawer({
   const [form, setForm] = useState<FormUser>({
     username: "",
     role_id: undefined,
-    isActive: true,
+    is_active: true,
     password: "",
   });
   const [roles, setRoles] = useState<Role[]>([]);
@@ -36,13 +36,13 @@ export function UserDrawer({
       setForm({
         username: user.username,
         role_id: (user as any).role_id,
-        isActive: user.isActive,
+        is_active: user.is_active,
       });
     } else {
       setForm({
         username: "",
         role_id: undefined,
-        isActive: true,
+        is_active: true,
         password: "",
       });
     }

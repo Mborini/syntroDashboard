@@ -4,7 +4,7 @@ export type User = {
   username: string;
   role: string;
   role_id?: number;     
-  isActive: boolean;
+  is_active: boolean;
   password?: string;    
 };
 
@@ -20,18 +20,18 @@ export interface CreateUserDTO {
   username: string;
   password: string;
   role_id: number; 
-  isActive: boolean;
+  is_active: boolean;
 }
 
 export interface UpdateUserDTO {
   username?: string;
   password?: string;
   role_id?: number;
-  isActive?: boolean;
+  is_active?: boolean;
 }
 export interface FormUser {
   username: string;
   password?: string;
   role_id?: number;
-  isActive: boolean;
+  is_active: boolean;
 };

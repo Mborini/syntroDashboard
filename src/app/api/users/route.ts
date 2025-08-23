@@ -7,7 +7,7 @@ export async function GET() {
   try {
     const client = await pool.connect();
     const res = await client.query(
-      `SELECT u.id, u.username, u."isActive", u.role_id, r.name as role
+      `SELECT u.id, u.username, u.is_active, u.role_id, r.name as role
        FROM users u
        JOIN roles r ON u.role_id = r.id`
     );
@@ -27,10 +27,10 @@ export async function POST(req: NextRequest) {
     const data: CreateUserDTO = await req.json();
 
     const res = await client.query(
-      `INSERT INTO users (username, password, role_id, "isActive")
+      `INSERT INTO users (username, password, role_id, is_active)
        VALUES ($1, $2, $3, $4)
-       RETURNING id, username, "isActive"`,
-      [data.username, data.password, data.role_id, data.isActive]
+       RETURNING id, username, is_active`,
+      [data.username, data.password, data.role_id, data.is_active]
     );
 
     client.release();

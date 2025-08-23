@@ -52,7 +52,7 @@ export function UsersTable() {
       try {
         const updatedUser = await toggleUserStatus(
           statusUser.id,
-          !statusUser.isActive,
+          !statusUser.is_active,
         );
         setUsers((prev) =>
           prev.map((u) =>
@@ -172,7 +172,7 @@ export function UsersTable() {
                   <Table.Td>{user.role}</Table.Td>
                   <Table.Td>
                     <Group className="justify-center">
-                      {user.isActive ? (
+                      {user.is_active ? (
                         <Badge variant="light" color="green">
                           <UserCheck size={16} />
                         </Badge>
@@ -187,10 +187,10 @@ export function UsersTable() {
                     <Group className="flex justify-center">
                       <ActionIcon
                         variant="subtle"
-                        color={user.isActive ? "red" : "green"}
+                        color={user.is_active ? "red" : "green"}
                         onClick={() => handleToggleStatusClick(user)}
                       >
-                        {user.isActive ? (
+                        {user.is_active ? (
                           <UserRoundX  size={16} />
                         ) : (
                           <UserCheck  size={16} />
@@ -234,8 +234,8 @@ export function UsersTable() {
         onClose={() => setStatusModalOpened(false)}
         onConfirm={handleConfirmToggleStatus}
         title="Change User Status"
-        message={`Are you sure you want to ${statusUser?.isActive ? "deactivate" : "activate"} this user?`}
-        color={statusUser?.isActive ? "red" : "green"}
+        message={`Are you sure you want to ${statusUser?.is_active ? "deactivate" : "activate"} this user?`}
+        color={statusUser?.is_active ? "red" : "green"}
       />
 
       <ConfirmModal

@@ -49,11 +49,11 @@ export async function deleteUser(id: number): Promise<boolean> {
   return true;
 }
 
-export async function toggleUserStatus(id: number, isActive: boolean): Promise<User> {
+export async function toggleUserStatus(id: number, is_active: boolean): Promise<User> {
   const res = await fetch(`${API_URL}/${id}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ isActive }),
+    body: JSON.stringify({ is_active }),
   });
   return handleResponse<User>(res);
 }

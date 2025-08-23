@@ -16,10 +16,10 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     if (data.username) { fields.push(`username=$${i++}`); values.push(data.username); }
     if (data.role_id) { fields.push(`role_id=$${i++}`); values.push(data.role_id); }
     if (data.password) { fields.push(`password=$${i++}`); values.push(data.password); }
-    if (data.isActive !== undefined) { fields.push(`"isActive"=$${i++}`); values.push(data.isActive); }
+    if (data.is_active !== undefined) { fields.push(`is_active=$${i++}`); values.push(data.is_active); }
 
     const res = await client.query(
-      `UPDATE users SET ${fields.join(", ")} WHERE id=$${i} RETURNING id, username, "isActive", role_id`,
+      `UPDATE users SET ${fields.join(", ")} WHERE id=$${i} RETURNING id, username, is_active, role_id`,
       [...values, id]
     );
 
@@ -51,11 +51,11 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   try {
     const client = await pool.connect();
     const id = Number(params.id);
-    const { isActive } = await req.json();
+    const { is_active } = await req.json();
 
     const res = await client.query(
-      `UPDATE users SET "isActive"=$1 WHERE id=$2 RETURNING id, username, "isActive"`,
-      [isActive, id]
+      `UPDATE users SET is_active=$1 WHERE id=$2 RETURNING id, username, is_active`,
+      [is_active, id]
     );
 
     client.release();
