@@ -1,6 +1,26 @@
+// data.ts
 import * as Icons from "../icons";
-import { GraduationCap, User2Icon, UserCog } from "lucide-react";
-export const NAV_DATA = [
+import {
+  DoorClosed,
+  GitBranchIcon,
+  GraduationCap,
+  User2Icon,
+  UserCog,
+} from "lucide-react";
+
+export interface NavItem {
+  title: string;
+  url?: string;
+  icon?: React.ComponentType<any>;
+  items: NavItem[]; // دائمًا مصفوفة
+}
+
+export interface NavSection {
+  label: string;
+  items: NavItem[];
+}
+
+export const NAV_DATA: NavSection[] = [
   {
     label: "MAIN MENU",
     items: [
@@ -11,6 +31,7 @@ export const NAV_DATA = [
           {
             title: "eCommerce",
             url: "/dashboard/ecommerce",
+            items: [],
           },
         ],
       },
@@ -33,8 +54,26 @@ export const NAV_DATA = [
         items: [],
       },
       {
+        title: "Classes & Sections",
+        icon: DoorClosed,
+        items: [
+          {
+            title: "Classes",
+            url: "/dashboard/classes",
+            icon: DoorClosed,
+            items: [],
+          },
+          {
+            title: "Sections",
+            url: "/dashboard/sections",
+            icon: GitBranchIcon,
+            items: [],
+          },
+        ],
+      },
+      {
         title: "Users",
-            url: "/dashboard/users",
+        url: "/dashboard/users",
         icon: UserCog,
         items: [],
       },
@@ -45,10 +84,12 @@ export const NAV_DATA = [
           {
             title: "Form Elements",
             url: "/dashboard/forms/form-elements",
+            items: [],
           },
           {
             title: "Form Layout",
             url: "/dashboard/forms/form-layout",
+            items: [],
           },
         ],
       },
@@ -59,6 +100,7 @@ export const NAV_DATA = [
           {
             title: "Settings",
             url: "/dashboard/pages/settings",
+            items: [],
           },
         ],
       },
@@ -74,6 +116,7 @@ export const NAV_DATA = [
           {
             title: "Basic Chart",
             url: "/dashboard/charts/basic-chart",
+            items: [],
           },
         ],
       },
@@ -84,10 +127,12 @@ export const NAV_DATA = [
           {
             title: "Alerts",
             url: "/dashboard/ui-elements/alerts",
+            items: [],
           },
           {
             title: "Buttons",
             url: "/dashboard/ui-elements/buttons",
+            items: [],
           },
         ],
       },
@@ -98,6 +143,7 @@ export const NAV_DATA = [
           {
             title: "Sign In",
             url: "/dashboard/auth/sign-in",
+            items: [],
           },
         ],
       },
