@@ -12,7 +12,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     const fields = [];
     const values = [];
     let i = 1;
-
+    if (data.name) { fields.push(`name=$${i++}`); values.push(data.name); }
     if (data.username) { fields.push(`username=$${i++}`); values.push(data.username); }
     if (data.role_id) { fields.push(`role_id=$${i++}`); values.push(data.role_id); }
     if (data.password) { fields.push(`password=$${i++}`); values.push(data.password); }

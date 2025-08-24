@@ -56,9 +56,7 @@ export function UsersTable() {
         );
         setUsers((prev) =>
           prev.map((u) =>
-            u.id === updatedUser.id
-              ? { ...updatedUser, role: u.role }
-              : u,
+            u.id === updatedUser.id ? { ...updatedUser, role: u.role } : u,
           ),
         );
         Toast.success("User status changed successfully");
@@ -157,6 +155,9 @@ export function UsersTable() {
             <Table.Thead>
               <Table.Tr className="h-12 align-middle">
                 <Table.Th className="text-center align-middle">Name</Table.Th>
+                <Table.Th className="text-center align-middle">
+                  User Name
+                </Table.Th>
                 <Table.Th className="text-center align-middle">Role</Table.Th>
                 <Table.Th className="text-center align-middle">Status</Table.Th>
                 <Table.Th className="text-center align-middle">
@@ -168,6 +169,7 @@ export function UsersTable() {
             <Table.Tbody>
               {users.map((user) => (
                 <Table.Tr key={user.id} className="h-12 align-middle">
+                  <Table.Td>{user.name}</Table.Td>
                   <Table.Td>{user.username}</Table.Td>
                   <Table.Td>{user.role}</Table.Td>
                   <Table.Td>
@@ -184,21 +186,21 @@ export function UsersTable() {
                     </Group>
                   </Table.Td>
                   <Table.Td>
-                    <Group className="flex justify-center">
+                   <Group className="justify-center">
                       <ActionIcon
                         variant="subtle"
                         color={user.is_active ? "red" : "green"}
                         onClick={() => handleToggleStatusClick(user)}
                       >
                         {user.is_active ? (
-                          <UserRoundX  size={16} />
+                          <UserRoundX size={16} />
                         ) : (
-                          <UserCheck  size={16} />
+                          <UserCheck size={16} />
                         )}
                       </ActionIcon>
 
                       <ActionIcon
-                        variant="subtle"
+                      variant="subtle"
                         color="orange"
                         onClick={() => {
                           setSelectedUser(user);
@@ -208,7 +210,7 @@ export function UsersTable() {
                         <PencilIcon size={18} />
                       </ActionIcon>
                       <ActionIcon
-                        variant="subtle"
+                      variant="subtle"
                         color="red"
                         onClick={() => handleDeleteClick(user)}
                       >

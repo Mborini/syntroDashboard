@@ -1,15 +1,18 @@
 import pool from "@/lib/db";
+import { CreateStudentDTO } from "@/types/student";
 import { CreateUserDTO } from "@/types/user";
 import { NextRequest, NextResponse } from "next/server";
 
-// GET /api/users
 export async function GET() {
   try {
     const client = await pool.connect();
     const res = await client.query(
-      `SELECT u.id,u.name, u.username, u.is_active, u.role_id, r.name as role
-       FROM users u
-       JOIN roles r ON u.role_id = r.id`
+      `SELECT s.id, s.name, s.is_active, sec.name as section_name, c.name as class_name , c.id as class_id , sec.id as section_id
+       FROM students s
+       inner join sections sec on s.section_id = sec.id
+       inner join classes c on sec.class_id = c.id
+       ORDER BY s.id ASC
+       `
     );
     client.release();
     return NextResponse.json(res.rows);
@@ -20,17 +23,16 @@ export async function GET() {
 }
 
 
-// POST /api/users
 export async function POST(req: NextRequest) {
   try {
     const client = await pool.connect();
-    const data: CreateUserDTO = await req.json();
+    const data: CreateStudentDTO = await req.json();
 
     const res = await client.query(
-      `INSERT INTO users (name, username, password, role_id, is_active)
-       VALUES ($1, $2, $3, $4, $5)
-       RETURNING id, name, username, is_active`,
-      [data.name, data.username, data.password, data.role_id, data.is_active]
+      `INSERT INTO students (name, section_id, is_active)
+       VALUES ($1, $2, $3)
+       RETURNING id, name, section_id, is_active`,
+      [data.name, data.section_id, data.is_active]
     );
 
     client.release();

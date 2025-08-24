@@ -24,6 +24,7 @@ export function UserDrawer({
   onSubmit,
 }: UserDrawerProps) {
   const [form, setForm] = useState<FormUser>({
+    name: "",
     username: "",
     role_id: undefined,
     is_active: true,
@@ -34,12 +35,14 @@ export function UserDrawer({
   useEffect(() => {
     if (user) {
       setForm({
+        name: user.name,
         username: user.username,
         role_id: (user as any).role_id,
         is_active: user.is_active,
       });
     } else {
       setForm({
+        name: "",
         username: "",
         role_id: undefined,
         is_active: true,
@@ -76,6 +79,15 @@ export function UserDrawer({
       title={user ? "Edit User" : "Add User"}
     >
       <div className="flex flex-col gap-4">
+        <TextInput
+          radius={"md"}
+          label="Name"
+          placeholder="Enter name"
+          value={form.name}
+          onChange={(e) =>
+            setForm({ ...form, name: e.currentTarget.value })
+          }
+        />
         <TextInput
           radius={"md"}
           label="Username"

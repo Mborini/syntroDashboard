@@ -1,5 +1,5 @@
 import * as Icons from "../icons";
-import { User2Icon, UserCog } from "lucide-react";
+import { GraduationCap, User2Icon, UserCog } from "lucide-react";
 export const NAV_DATA = [
   {
     label: "MAIN MENU",
@@ -24,6 +24,12 @@ export const NAV_DATA = [
         title: "Profile",
         url: "/dashboard/profile",
         icon: User2Icon,
+        items: [],
+      },
+      {
+        title: "Students",
+        url: "/dashboard/students",
+        icon: GraduationCap,
         items: [],
       },
       {

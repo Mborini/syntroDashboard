@@ -21,6 +21,7 @@ export function AppButton({
 }: AppButtonProps) {
   return (
     <Button
+      variant="light"
       radius={radius}
       color={color}
       onClick={onClick}

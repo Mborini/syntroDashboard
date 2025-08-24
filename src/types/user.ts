@@ -1,6 +1,7 @@
 
 export type User = {
-  id: number;          
+  id: number;     
+  name: string;     
   username: string;
   role: string;
   role_id?: number;     
@@ -17,6 +18,7 @@ export type UserDrawerProps = {
 
 // user.types.ts
 export interface CreateUserDTO {
+  name: string;
   username: string;
   password: string;
   role_id: number; 
@@ -24,12 +26,14 @@ export interface CreateUserDTO {
 }
 
 export interface UpdateUserDTO {
+  name: string;
   username?: string;
   password?: string;
   role_id?: number;
   is_active?: boolean;
 }
 export interface FormUser {
+  name: string;
   username: string;
   password?: string;
   role_id?: number;
