@@ -4,6 +4,8 @@ import {
   DoorClosed,
   GitBranchIcon,
   GraduationCap,
+  ShieldUser,
+  UnplugIcon,
   User2Icon,
   UserCog,
 } from "lucide-react";
@@ -51,6 +53,18 @@ export const NAV_DATA: NavSection[] = [
         title: "Students",
         url: "/dashboard/students",
         icon: GraduationCap,
+        items: [],
+      },
+      {
+        title: "Parents",
+        url: "/dashboard/parents",
+        icon: ShieldUser,
+        items: [],
+      },
+      {
+        title: "Link Students",
+        url: "/dashboard/link",
+        icon: UnplugIcon,
         items: [],
       },
       {

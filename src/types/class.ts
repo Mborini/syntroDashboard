@@ -10,6 +10,7 @@ export interface Class {
 
 export interface CreateClassDTO {
   name: string;
+  
   academic_year?: string;
 }
 

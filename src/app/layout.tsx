@@ -21,11 +21,15 @@ export default function RootLayout({ children }: PropsWithChildren) {
           <Providers>
             <main className="isolate mx-auto w-full overflow-hidden">
               {children}
-              <Toaster
-                position="top-center"
-                reverseOrder={false}
-              />
             </main>
+
+            <Toaster
+              position="top-center"
+              reverseOrder={false}
+              toastOptions={{
+                style: { zIndex: 2147483647 },
+              }}
+            />
           </Providers>
         </ThemeProvider>
       </body>
