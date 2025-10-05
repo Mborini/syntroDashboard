@@ -55,7 +55,7 @@ export function Sidebar() {
         )}
         aria-label="Main navigation"
         aria-hidden={!isOpen}
-        inert={isOpen ? undefined : true}
+        inert={isOpen ? undefined : true} 
       >
         <div className="flex h-full flex-col py-5 pl-[25px] pr-[7px]">
           <div className="relative pr-4.5">

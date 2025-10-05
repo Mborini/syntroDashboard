@@ -9,7 +9,11 @@ interface PasswordModalProps {
   onConfirm: (password: string) => void;
 }
 
-export default function PasswordModal({ opened, onClose, onConfirm }: PasswordModalProps) {
+export default function PasswordModal({
+  opened,
+  onClose,
+  onConfirm,
+}: PasswordModalProps) {
   const [password, setPassword] = useState("");
 
   const handleConfirm = () => {
@@ -20,18 +24,18 @@ export default function PasswordModal({ opened, onClose, onConfirm }: PasswordMo
 
   return (
     <Modal opened={opened} onClose={onClose} title="Change Password" centered>
-      <PasswordInput
-        variant="filled"
-        radius="lg"
-        label="New Password"
-        placeholder="Enter new password"
-        value={password}
-        onChange={(e) => setPassword(e.currentTarget.value)}
-        mb="md"
-      />
       <Group className="justify-end">
         <Button variant="default" onClick={onClose}>
           Cancel
+          <PasswordInput
+            variant="filled"
+            radius="lg"
+            label="New Password"
+            placeholder="Enter new password"
+            value={password}
+            onChange={(e) => setPassword(e.currentTarget.value)}
+            mb="md"
+          />
         </Button>
         <Button color="violet" onClick={handleConfirm}>
           Save

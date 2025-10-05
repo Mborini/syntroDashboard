@@ -24,7 +24,7 @@ export function Header() {
 
       <div className="max-xl:hidden">
         <h1 className="mb-0.5 text-heading-5 font-bold text-dark dark:text-white">
-          Dashboard
+          Managment system
         </h1>
       </div>
 
@@ -39,7 +39,7 @@ export function Header() {
           <SearchIcon className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 max-[1015px]:size-5" />
         </div>
 
-        <ThemeToggleSwitch />
+        
 
         <Notification />
 

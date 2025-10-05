@@ -186,15 +186,17 @@ export function UsersTable() {
                     </Group>
                   </Table.Td>
                   <Table.Td>
-                   <Group className="justify-center">
-                      <ActionIcon
-                        variant="subtle"
-                        color={user.is_active ? "red" : "green"}
-                        onClick={() => handleToggleStatusClick(user)}
-                      >
-                        {user.is_active ? (
-                          <UserRoundX size={16} />
-                        ) : (
+                    {
+                      user.id !== -1 && ( // Disable actions for the main admin user
+                        <Group className="justify-center">
+                          <ActionIcon
+                            variant="subtle"
+                            color={user.is_active ? "red" : "green"}
+                            onClick={() => handleToggleStatusClick(user)}
+                          >
+                            {user.is_active ? (
+                              <UserRoundX size={16} />
+                            ) : (
                           <UserCheck size={16} />
                         )}
                       </ActionIcon>
@@ -217,6 +219,7 @@ export function UsersTable() {
                         <Trash2 size={18} />
                       </ActionIcon>
                     </Group>
+                  )}
                   </Table.Td>
                 </Table.Tr>
               ))}

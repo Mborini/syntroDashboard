@@ -1,31 +1,26 @@
-// components/AppButton.tsx
+// components/ui-elements/button.tsx
 "use client";
 
-import { Button } from "@mantine/core";
+import { Button, ButtonProps } from "@mantine/core";
 import { ReactNode } from "react";
 
-interface AppButtonProps {
-  color?: string;
-  onClick?: () => void;
-  children: ReactNode;
-  radius?: "sm" | "md" | "lg" | "xl";
+export interface AppButtonProps extends Omit<ButtonProps, "children"> {
   fullWidth?: boolean;
+  children?: ReactNode; // children لازم يكون ReactNode مش string
 }
 
 export function AppButton({
-  color,
-  onClick,
   children,
   radius = "md",
   fullWidth = false,
+  ...rest
 }: AppButtonProps) {
   return (
     <Button
       variant="light"
       radius={radius}
-      color={color}
-      onClick={onClick}
       w={fullWidth ? "100%" : undefined}
+      {...rest} // هنا onClick, color, disabled, size كلها تمر
     >
       {children}
     </Button>

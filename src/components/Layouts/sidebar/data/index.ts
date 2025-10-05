@@ -56,8 +56,14 @@ export const NAV_DATA: NavSection[] = [
         items: [],
       },
       {
-        title: "Parents",
-        url: "/dashboard/parents",
+        title: "الموردون",
+        url: "/dashboard/suppliers",
+        icon: ShieldUser,
+        items: [],
+      },
+      {
+        title: "العملاء",
+        url: "/dashboard/customers",
         icon: ShieldUser,
         items: [],
       },
@@ -68,25 +74,43 @@ export const NAV_DATA: NavSection[] = [
         items: [],
       },
       {
-        title: "Classes & Sections",
+        title: "الفواتير",
         icon: DoorClosed,
         items: [
           {
-            title: "Classes",
-            url: "/dashboard/classes",
+            title: "مشتريات",
+            url: "/dashboard/invoices/purchases",
             icon: DoorClosed,
             items: [],
           },
           {
-            title: "Sections",
-            url: "/dashboard/sections",
-            icon: GitBranchIcon,
+            title: "مصاريف",
+            url: "/dashboard/invoices/expenses",
+            icon: DoorClosed,
             items: [],
           },
         ],
       },
       {
-        title: "Users",
+        title: "الموظفين",
+        icon: DoorClosed,
+        items: [
+          {
+            title: "ادارة الموظفين",
+            url: "/dashboard/employees/management",
+            icon: DoorClosed,
+            items: [],
+          },
+          {
+            title: "الدوام اليومي",
+            url: "/dashboard/employees/attendance",
+            icon: DoorClosed,
+            items: [],
+          },
+        ],
+      },
+      {
+        title: "المستخدمين",
         url: "/dashboard/users",
         icon: UserCog,
         items: [],

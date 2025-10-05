@@ -20,6 +20,7 @@ export default function ConfirmModal({
   }
   return (
     <Modal
+    dir="rtl"
       opened={opened}
       onClose={onClose}
       centered
@@ -33,7 +34,7 @@ export default function ConfirmModal({
       <Text mb="md">{message}</Text>
       <Group>
         <AppButton color="gray" onClick={onClose}>
-          Cancel
+          الغاء
         </AppButton>
         <AppButton
           color={color}
@@ -42,7 +43,7 @@ export default function ConfirmModal({
             onClose();
           }}
         >
-          Confirm
+          تأكيد الحذف
         </AppButton>
       </Group>
     </Modal>
