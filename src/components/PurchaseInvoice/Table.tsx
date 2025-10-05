@@ -56,6 +56,7 @@ export function PurchaseInvoiceTable() {
     setLoading(true);
     try {
       const data = await getPurchaseInvoices();
+      console.log(data);
       setInvoices(data);
       setFilteredInvoices(data);
     } catch (error) {
@@ -180,9 +181,10 @@ export function PurchaseInvoiceTable() {
 
                 const matchesItemName = itemName
                   ? inv.items.some((item) =>
-                      item.name
-                        .toLowerCase()
-                        .includes(itemName.trim().toLowerCase()),
+                      typeof item.name === "string" &&
+                        item.name
+                          .toLowerCase()
+                          .includes(itemName.trim().toLowerCase()),
                     )
                   : true;
 

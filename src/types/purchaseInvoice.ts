@@ -1,41 +1,42 @@
 // عنصر واحد داخل الفاتورة
 export type InvoiceItem = {
-  id?: number;       // اختياري (لو بتخزن بالـ DB)
-  name: string;      // اسم الصنف
-  qty: number;       // الكمية
-  price: number;     // السعر للوحدة
+  id?: number;        // رقم داخلي (اختياري)
+  item_id: number;    // معرف الصنف فقط
+  qty: number;        // الكمية
+  price: number;      // السعر للوحدة
+  name?: string; // اسم الصنف (اختياري للعرض فقط)
 };
 
 // إنشاء فاتورة جديدة
 export type CreatePurchaseInvoiceDTO = {
-  invoice_no: string;       // رقم الفاتورة
-  supplier_id?: number;     // معرف المورد (اختياري لو عندك جدول موردين)
-  supplier?: string;   // اسم المورد (لو ما عندك جدول منفصل)
-  invoice_date?: string;    // تاريخ الفاتورة
-  items: InvoiceItem[];     // العناصر
-  currency?: string;        // العملة (USD, JOD, ...)
-status?: number; // بدل "Draft" | "Posted"
-  grand_total?: number;
-  paid_amount?: number;     // المبلغ المدفوع
-  remaining_amount?: number; // المبلغ المتبقي
+  invoice_no: string;          
+  supplier_id?: number;        
+  supplier?: string;           
+  invoice_date?: string;       
+  items: InvoiceItem[];        // الأصناف
+  currency?: string;           
+  status: number;              // 1 = ذمم، 2 = مدفوع جزئي، 3 = مدفوع
+  grand_total: number;         
+  paid_amount: number;         
+  remaining_amount: number;    
 };
 
-// تحديث فاتورة (كل شيء اختياري لأنه تحديث جزئي)
+// تحديث فاتورة (كل القيم اختيارية)
 export type UpdatePurchaseInvoiceDTO = Partial<CreatePurchaseInvoiceDTO>;
 
-// الفاتورة كاملة زي ما بترجع من الـ API أو DB
+// الفاتورة كاملة من قاعدة البيانات
 export type PurchaseInvoice = {
-  remaining_amount: number;
-  paid_amount: number;
-  id: number;                // رقم داخلي من قاعدة البيانات
-  invoice_no: string;
+  id: number;                  
+  invoice_no: string;          
   supplier_id?: number;
   supplier?: string;
   invoice_date: string;
-  items: InvoiceItem[];
+  items: InvoiceItem[];        // الأصناف تحتوي فقط على item_id
   currency?: string;
-  grand_total: number;       // المجموع الكلي محسوب = sum(items.qty * items.price)
-status?: number; // بدل "Draft" | "Posted"
-  created_at?: string;       // وقت الإنشاء
-  updated_at?: string;       // وقت آخر تعديل
+  status: number;              
+  grand_total: number;
+  paid_amount: number;
+  remaining_amount: number;
+  created_at?: string;         
+  updated_at?: string;         
 };

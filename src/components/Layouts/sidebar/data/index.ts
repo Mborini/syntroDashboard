@@ -92,6 +92,42 @@ export const NAV_DATA: NavSection[] = [
         ],
       },
       {
+        title: "الاصناف",
+        icon: DoorClosed,
+        items: [
+          {
+            title: "اصناف المشتريات",
+            url: "/dashboard/items/purchasesItems",
+            icon: DoorClosed,
+            items: [],
+          },
+          {
+            title: "اصناف المبيعات",
+            url: "/dashboard/items/salesItems",
+            icon: DoorClosed,
+            items: [],
+          },
+        ],
+      },
+      {
+        title: "المستودعات",
+        icon: DoorClosed,
+        items: [
+          {
+            title: " مستودع المواد الاولية",
+            url: "/dashboard/inventories/inventory",
+            icon: DoorClosed,
+            items: [],
+          },
+          {
+            title: "مستودع الانتاج ",
+            url: "/dashboard/inventories/inventory",
+            icon: DoorClosed,
+            items: [],
+          },
+        ],
+      },
+      {
         title: "الموظفين",
         icon: DoorClosed,
         items: [

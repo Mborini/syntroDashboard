@@ -1,12 +1,12 @@
 "use client";
-import { PurchaseInvoice } from "@/types/purchaseInvoice";
+import { ExpensesInvoice } from "@/types/ExpensesInvoice";
 import { Modal, Table, Text } from "@mantine/core";
 import { Badge } from "@mantine/core"; // استخدم Mantine Badge بدل Lucide
 
 type Props = {
   opened: boolean;
   onClose: () => void;
-  invoice: PurchaseInvoice | null;
+  invoice: ExpensesInvoice | null;
 };
 
 export function InvoiceDetailsModal({ opened, onClose, invoice }: Props) {
