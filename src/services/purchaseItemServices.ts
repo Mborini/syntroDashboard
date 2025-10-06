@@ -27,11 +27,17 @@ export async function updatePurchaseItem(id: number, data: UpdatePurchaseItemDTO
   if (!res.ok) throw new Error("Failed to update purchase item");
   return res.json();
 }
-
 export async function deletePurchaseItem(id: number) {
   const res = await fetch(`${BASE_URL}/${id}`, {
     method: "DELETE",
   });
-  if (!res.ok) throw new Error("Failed to delete purchase item");
-  return res.json();
+
+  const data = await res.json(); // قراءة JSON حتى لو كان خطأ
+
+  if (!res.ok) {
+    // رمي البيانات لتلتقط في الـ catch على الـ frontend
+    throw new Error(data.error || "فشل حذف الصنف");
+  }
+
+  return data;
 }

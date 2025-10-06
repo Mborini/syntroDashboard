@@ -39,7 +39,18 @@ export const updatePurchaseInvoice = async (
 
 // حذف فاتورة
 export const deletePurchaseInvoice = async (id: number) => {
-  const res = await fetch(`${API}/${id}`, { method: "DELETE" });
-  if (!res.ok) throw new Error("Failed to delete purchase invoice");
-  return res.json();
-};
+  const res = await fetch(`${API}/${id}`, {
+    method: "DELETE",
+  });
+
+  const data = await res.json(); // قراءة JSON حتى لو كان خطأ
+
+  if (!res.ok) {
+    // رمي Error مع إضافة missingItems
+    const error: any = new Error(data.error || "فشل حذف الفاتورة");
+    if (data.missingItems) error.missingItems = data.missingItems;
+    throw error;
+  }
+
+  return data;
+}

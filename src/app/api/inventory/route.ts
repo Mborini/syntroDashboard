@@ -15,7 +15,9 @@ export async function GET() {
         p.weight
       FROM inventory i
       JOIN purchase_items p ON i.item_id = p.id
+      where i.quantity > 0
       ORDER BY p.name ASC;
+      
     `);
 
     client.release();

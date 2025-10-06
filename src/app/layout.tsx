@@ -24,10 +24,11 @@ export default function RootLayout({ children }: PropsWithChildren) {
             </main>
 
             <Toaster
+            
               position="top-center"
               reverseOrder={false}
               toastOptions={{
-                style: { zIndex: 2147483647 },
+                style: { zIndex: 2147483647 ,direction:"rtl" },
               }}
             />
           </Providers>

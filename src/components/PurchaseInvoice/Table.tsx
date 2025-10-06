@@ -99,21 +99,27 @@ export function PurchaseInvoiceTable() {
     setModalOpened(true);
   };
 
-  const handleConfirmDelete = async () => {
-    if (!invoiceToDelete) return;
-    try {
-      await deletePurchaseInvoice(invoiceToDelete.id);
-      setInvoices((prev) => prev.filter((c) => c.id !== invoiceToDelete.id));
-      setFilteredInvoices((prev) =>
-        prev.filter((c) => c.id !== invoiceToDelete.id),
-      );
-      setModalOpened(false);
-      Toast.success("Invoice deleted successfully");
-    } catch (error) {
-      console.error(error);
-      Toast.error("Failed to delete invoice");
+const handleConfirmDelete = async () => {
+  if (!invoiceToDelete) return;
+  try {
+    await deletePurchaseInvoice(invoiceToDelete.id);
+    setInvoices(prev => prev.filter(c => c.id !== invoiceToDelete.id));
+    setFilteredInvoices(prev => prev.filter(c => c.id !== invoiceToDelete.id));
+    setModalOpened(false);
+    Toast.success("Invoice deleted successfully");
+  } catch (error: any) {
+    console.error(error);
+
+    if (error?.missingItems) {
+      const itemsList = error.missingItems
+        .map((i: any) => `${i.name}: مطلوب ${i.requiredQty}, موجود ${i.availableQty}`)
+        .join("\n");
+      Toast.error(`يجب إعادة الأصناف التالية إلى المستودع أولًا:\n${itemsList}`);
+    } else {
+      Toast.error(error.message || "Failed to delete invoice");
     }
-  };
+  }
+};
 
   const handleFilter = (query: string) => {
     const q = query.trim().toLowerCase();

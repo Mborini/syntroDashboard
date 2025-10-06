@@ -35,3 +35,18 @@ export async function deleteInventoryItem(id: number): Promise<void> {
     method: "DELETE",
   });
 }
+export async function withdrawFromInventory(data: {
+  item_id: number;
+  quantity: number;
+  notes?: string;
+}) {
+  const res = await fetch("/api/inventory/withdrawals", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) throw new Error("فشل السحب من المستودع");
+  return await res.json();
+}
+

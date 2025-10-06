@@ -13,7 +13,7 @@ export default async function DashboardLayout({ children }: PropsWithChildren) {
 
   return ( 
     <div className="flex min-h-screen">
-      <Sidebar />
+      
 
       <div className="w-full bg-gray-2 dark:bg-[#020d1a]">
         <Header />
@@ -23,7 +23,7 @@ export default async function DashboardLayout({ children }: PropsWithChildren) {
           {children}
         
         </main>
-      </div>
+      </div><Sidebar />
     </div>
   );
 }

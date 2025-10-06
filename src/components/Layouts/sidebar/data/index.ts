@@ -9,7 +9,11 @@ import {
   User2Icon,
   UserCog,
 } from "lucide-react";
-
+import { TbFileInvoice } from "react-icons/tb";
+import { RiAlignItemLeftFill } from "react-icons/ri";
+import { SiHomeassistantcommunitystore } from "react-icons/si";
+import { AiOutlineProduct } from "react-icons/ai";
+import { IoMdMan } from "react-icons/io";
 export interface NavItem {
   title: string;
   url?: string;
@@ -37,24 +41,7 @@ export const NAV_DATA: NavSection[] = [
           },
         ],
       },
-      {
-        title: "Calendar",
-        url: "/calendar",
-        icon: Icons.Calendar,
-        items: [],
-      },
-      {
-        title: "Profile",
-        url: "/dashboard/profile",
-        icon: User2Icon,
-        items: [],
-      },
-      {
-        title: "Students",
-        url: "/dashboard/students",
-        icon: GraduationCap,
-        items: [],
-      },
+     
       {
         title: "الموردون",
         url: "/dashboard/suppliers",
@@ -67,15 +54,10 @@ export const NAV_DATA: NavSection[] = [
         icon: ShieldUser,
         items: [],
       },
-      {
-        title: "Link Students",
-        url: "/dashboard/link",
-        icon: UnplugIcon,
-        items: [],
-      },
+     
       {
         title: "الفواتير",
-        icon: DoorClosed,
+        icon: TbFileInvoice ,
         items: [
           {
             title: "مشتريات",
@@ -93,35 +75,48 @@ export const NAV_DATA: NavSection[] = [
       },
       {
         title: "الاصناف",
-        icon: DoorClosed,
+        icon: RiAlignItemLeftFill ,
         items: [
           {
             title: "اصناف المشتريات",
             url: "/dashboard/items/purchasesItems",
-            icon: DoorClosed,
+            icon: AiOutlineProduct ,
             items: [],
           },
           {
             title: "اصناف المبيعات",
             url: "/dashboard/items/salesItems",
-            icon: DoorClosed,
+            icon: AiOutlineProduct,
             items: [],
+            
           },
         ],
       },
       {
         title: "المستودعات",
-        icon: DoorClosed,
+        icon: SiHomeassistantcommunitystore ,
         items: [
           {
-            title: " مستودع المواد الاولية",
+            title: "المواد الاولية",
+            url: "/dashboard/inventories/inventory",
+            icon: DoorClosed,
+            items: [{
+             title: "عرض المستودع",
             url: "/dashboard/inventories/inventory",
             icon: DoorClosed,
             items: [],
           },
+              {
+                title: "حركات السحب",
+                url: "/dashboard/inventories/InventoryWithdraw",
+                icon: DoorClosed,
+                items: [],
+              },
+            ],
+          },
           {
             title: "مستودع الانتاج ",
-            url: "/dashboard/inventories/inventory",
+            url: "/dashboard/inventories/InventoryProduction",
             icon: DoorClosed,
             items: [],
           },
@@ -129,7 +124,7 @@ export const NAV_DATA: NavSection[] = [
       },
       {
         title: "الموظفين",
-        icon: DoorClosed,
+        icon: IoMdMan ,
         items: [
           {
             title: "ادارة الموظفين",
@@ -149,6 +144,28 @@ export const NAV_DATA: NavSection[] = [
         title: "المستخدمين",
         url: "/dashboard/users",
         icon: UserCog,
+        items: [],
+      }, {
+        title: "Calendar",
+        url: "/calendar",
+        icon: Icons.Calendar,
+        items: [],
+      },
+      {
+        title: "Profile",
+        url: "/dashboard/profile",
+        icon: User2Icon,
+        items: [],
+      }, {
+        title: "Link Students",
+        url: "/dashboard/link",
+        icon: UnplugIcon,
+        items: [],
+      },
+      {
+        title: "Students",
+        url: "/dashboard/students",
+        icon: GraduationCap,
         items: [],
       },
       {

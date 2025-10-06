@@ -1,172 +1,112 @@
-// Sidebar.tsx
 "use client";
 
-import { Logo } from "@/components/logo";
-import { cn } from "@/lib/utils";
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
 import { NAV_DATA, NavItem } from "./data";
-import { ArrowLeftIcon, ChevronUp } from "./icons";
-import { MenuItem } from "./menu-item";
-import { useSidebarContext } from "./sidebar-context";
+import { ChevronUp } from "./icons";
+import { cn } from "@/lib/utils";
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { setIsOpen, isOpen, isMobile, toggleSidebar } = useSidebarContext();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
 
   const toggleExpanded = (title: string) => {
     setExpandedItems((prev) =>
-      prev.includes(title) ? [] : [title]
+      prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title],
     );
   };
 
-  useEffect(() => {
-    // Keep collapsible open, when its subpage is active
-    NAV_DATA.some((section) =>
-      section.items.some((item) =>
-        item.items.some((subItem) => {
-          if (subItem.url === pathname && !expandedItems.includes(item.title)) {
-            toggleExpanded(item.title);
-            return true;
-          }
-          return false;
-        })
-      )
+  const isActiveItem = (item: NavItem): boolean =>
+    item.url === pathname || item.items.some((sub) => isActiveItem(sub));
+
+  const RenderNavItem = ({
+    item,
+    depth = 1,
+  }: {
+    item: NavItem;
+    depth?: number;
+  }) => {
+    const isExpanded = expandedItems.includes(item.title);
+    const isActive = isActiveItem(item);
+
+    const fontSize =
+      depth === 1 ? "text-base" : depth === 2 ? "text-sm" : "text-xs";
+    const paddingLeft = `${depth * 6}px`;
+
+    if (item.items.length === 0) {
+      return (
+        <Link
+          dir="rtl"
+          href={item.url ?? "/"}
+          className={cn(
+            "flex items-center gap-3 rounded py-2 transition-colors duration-200",
+            fontSize,
+            isActive
+              ? "bg-blue-100 text-blue-700 dark:bg-blue-700 dark:text-white"
+              : "hover:bg-gray-100 dark:hover:bg-gray-700",
+          )}
+          style={{ paddingLeft }}
+        >
+          {item.icon && <item.icon className="size-5 font-bold shrink-0" />}
+          <span>{item.title}</span>
+        </Link>
+      );
+    }
+
+    return (
+      <div>
+        <button
+          onClick={() => toggleExpanded(item.title)}
+          className={cn(
+            "flex w-full items-center gap-3 rounded py-2 font-bold transition-colors duration-200",
+            fontSize,
+            isActive
+              ? "bg-blue-100 text-blue-700 dark:bg-blue-700 dark:text-white"
+              : "hover:bg-gray-100 dark:hover:bg-gray-700",
+          )}
+          style={{ paddingLeft }}
+          dir="rtl"
+        >
+          {item.icon && <item.icon className="size-5  font-bold shrink-0" />}
+          <span>{item.title}</span>
+          <ChevronUp
+            className={cn(
+              "ml-auto transition-transform duration-200",
+              isExpanded && "rotate-180",
+            )}
+          />
+        </button>
+
+        {isExpanded && (
+          <ul className="mt-1 space-y-1  mr-6 font-bold">
+            {item.items.map((sub) => (
+              <li key={sub.title}>
+                <RenderNavItem item={sub} depth={depth + 1} />
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     );
-  }, [pathname]);
+  };
 
   return (
-    <>
-      {isMobile && isOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black/50 transition-opacity duration-300"
-          onClick={() => setIsOpen(false)}
-          aria-hidden="true"
-        />
-      )}
-
-      <aside
-        className={cn(
-          "max-w-[290px] overflow-hidden border-r border-gray-200 bg-white transition-[width] duration-200 ease-linear dark:border-gray-800 dark:bg-gray-dark",
-          isMobile ? "fixed bottom-0 top-0 z-50" : "sticky top-0 h-screen",
-          isOpen ? "w-full" : "w-0"
-        )}
-        aria-label="Main navigation"
-        aria-hidden={!isOpen}
-        inert={isOpen ? undefined : true} 
-      >
-        <div className="flex h-full flex-col py-5 pl-[25px] pr-[7px]">
-          <div className="relative pr-4.5">
-            <Link
-              href={"/dashboard"}
-              onClick={() => isMobile && toggleSidebar()}
-              className="px-0 py-0 min-[850px]:py-0"
-            >
-              <Logo />
-            </Link>
-
-            {isMobile && (
-              <button
-                onClick={toggleSidebar}
-                className="absolute left-3/4 right-4.5 top-1/2 -translate-y-1/2 text-right"
-              >
-                <span className="sr-only">Close Menu</span>
-                <ArrowLeftIcon className="ml-auto size-7" />
-              </button>
-            )}
-          </div>
-
-          {/* Navigation */}
-          <div className="custom-scrollbar mt-6 flex-1 overflow-y-auto pr-3 min-[850px]:mt-6">
-            {NAV_DATA.map((section) => (
-              <div key={section.label} className="mb-6">
-                <h2 className="mb-5 text-sm font-medium text-dark-4 dark:text-dark-6">
-                  {section.label}
-                </h2>
-
-                <nav role="navigation" aria-label={section.label}>
-                  <ul className="space-y-2">
-                    {section.items.map((item) => (
-                      <li key={item.title}>
-                        {item.items.length ? (
-                          <div>
-                            <MenuItem
-                              isActive={item.items.some(
-                                ({ url }) => url === pathname
-                              )}
-                              onClick={() => toggleExpanded(item.title)}
-                            >
-                              {item.icon && (
-                                <item.icon
-                                  className="size-6 shrink-0"
-                                  aria-hidden="true"
-                                />
-                              )}
-                              <span>{item.title}</span>
-
-                              <ChevronUp
-                                className={cn(
-                                  "ml-auto rotate-180 transition-transform duration-200",
-                                  expandedItems.includes(item.title) &&
-                                    "rotate-0"
-                                )}
-                                aria-hidden="true"
-                              />
-                            </MenuItem>
-
-                            {expandedItems.includes(item.title) && (
-                              <ul
-                                className="ml-9 mr-0 space-y-1.5 pb-[15px] pr-0 pt-2"
-                                role="menu"
-                              >
-                                {item.items.map((subItem) => (
-                                  <li key={subItem.title} role="none">
-                                    <MenuItem
-                                      as="link"
-                                      href={subItem.url ?? "/"}
-                                      isActive={pathname === subItem.url}
-                                      className="flex items-center gap-3 py-2"
-                                    >
-                                      {subItem.icon && (
-                                        <subItem.icon
-                                          className="size-5 shrink-0"
-                                          aria-hidden="true"
-                                        />
-                                      )}
-                                      <span>{subItem.title}</span>
-                                    </MenuItem>
-                                  </li>
-                                ))}
-                              </ul>
-                            )}
-                          </div>
-                        ) : (
-                          <MenuItem
-                            className="flex items-center gap-3 py-3"
-                            as="link"
-                            href={item.url ?? "/"}
-                            isActive={pathname === item.url}
-                          >
-                            {item.icon && (
-                              <item.icon
-                                className="size-6 shrink-0"
-                                aria-hidden="true"
-                              />
-                            )}
-                            <span>{item.title}</span>
-                          </MenuItem>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                </nav>
-              </div>
+    <aside className="h-screen w-72 overflow-y-auto border-r border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
+      {NAV_DATA.map((section) => (
+        <div key={section.label} className="mb-6">
+          <h2 className="mb-3 text-sm font-semibold text-gray-500 dark:text-gray-400">
+            {section.label}
+          </h2>
+          <ul className=" font-bold space-y-1">
+            {section.items.map((item) => (
+              <li key={item.title}>
+                <RenderNavItem item={item} />
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
-      </aside>
-    </>
+      ))}
+    </aside>
   );
 }

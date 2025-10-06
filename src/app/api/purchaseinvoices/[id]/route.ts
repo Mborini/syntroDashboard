@@ -82,8 +82,6 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }
 }
-
-// حذف فاتورة
 export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
   try {
     const id = Number(params.id);
@@ -93,16 +91,52 @@ export async function DELETE(_req: Request, { params }: { params: { id: string }
     try {
       await client.query("BEGIN");
 
-      // استرجاع الأصناف المرتبطة بالفاتورة لتعديل المخزون
+      // استرجاع الأصناف المرتبطة بالفاتورة
       const itemsRes = await client.query(
-        `SELECT item_id, qty FROM purchase_invoice_items WHERE invoice_id=$1`,
+        `SELECT pii.item_id, pii.qty, p.name 
+         FROM purchase_invoice_items pii
+         LEFT JOIN purchase_items p ON pii.item_id = p.id
+         WHERE pii.invoice_id=$1`,
         [id]
       );
+
+      if (itemsRes.rows.length === 0) {
+        await client.query("ROLLBACK");
+        client.release();
+        return NextResponse.json({ error: "Invoice has no items" }, { status: 400 });
+      }
+
+      // تحقق من المخزون لكل صنف
+      const missingItems: { name: string; requiredQty: number; availableQty: number }[] = [];
+      for (const item of itemsRes.rows) {
+        const stockRes = await client.query(
+          `SELECT quantity FROM inventory WHERE item_id=$1`,
+          [item.item_id]
+        );
+
+        const availableQty = stockRes.rows.length > 0 ? stockRes.rows[0].quantity : 0;
+        if (availableQty < item.qty) {
+          missingItems.push({ 
+            name: item.name, 
+            requiredQty: item.qty, 
+            availableQty 
+          });
+        }
+      }
+
+      if (missingItems.length > 0) {
+        await client.query("ROLLBACK");
+        client.release();
+        return NextResponse.json({
+          error: "بعض الأصناف غير موجودة في المستودع. يجب إعادة هذه الأصناف أولًا.",
+          missingItems,
+        }, { status: 400 });
+      }
 
       // نقص الكميات من المخزون
       for (const item of itemsRes.rows) {
         await client.query(
-          `UPDATE inventory SET quantity = quantity - $1 WHERE item_id=$2`,
+          `UPDATE inventory SET quantity = quantity - $1 WHERE item_id = $2`,
           [item.qty, item.item_id]
         );
       }
@@ -132,4 +166,3 @@ export async function DELETE(_req: Request, { params }: { params: { id: string }
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }
 }
-

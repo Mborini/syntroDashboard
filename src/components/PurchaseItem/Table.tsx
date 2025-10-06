@@ -100,23 +100,29 @@ export function PurchaseItemsTable() {
     setItemToDelete(item);
     setModalOpened(true);
   };
+const handleConfirmDelete = async () => {
+  if (itemToDelete) {
+    try {
+      await deletePurchaseItem(itemToDelete.id);
 
-  const handleConfirmDelete = async () => {
-    if (itemToDelete) {
-      try {
-        await deletePurchaseItem(itemToDelete.id);
-        const updated = items.filter((i) => i.id !== itemToDelete.id);
-        setItems(updated);
-        setFilteredItems(updated);
-        setItemToDelete(null);
-        setModalOpened(false);
-        Toast.success("تم حذف الصنف بنجاح");
-      } catch (error) {
-        Toast.error("فشل حذف الصنف");
-        console.error(error);
-      }
+      const updated = items.filter((i) => i.id !== itemToDelete.id);
+      setItems(updated);
+      setFilteredItems(updated);
+      setItemToDelete(null);
+      setModalOpened(false);
+
+      Toast.success("تم حذف الصنف بنجاح");
+    } catch (error: any) {
+      // حاول استخراج رسالة الخطأ من الاستجابة
+      const message =
+        error?.message || error?.error || "فشل حذف الصنف";
+
+      Toast.error(message);
+      console.error(error);
     }
-  };
+  }
+};
+
 
   if (loading) return <TableSkeleton columns={4} />;
 

@@ -1,17 +1,21 @@
 "use client";
 
-import { ScrollArea, Table, Group } from "@mantine/core";
+import { ScrollArea, Table, Group, Button } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { TableSkeleton } from "../Common/skeleton";
 import { Toast } from "@/lib/toast";
 import { InventoryItem } from "@/types/inventory";
 import { getInventoryItems } from "@/services/inventoryServices";
 import { InventoryFilter } from "./InventoryFilter.tsx";
+import { InventoryWithdrawDrawer } from "./InventoryWithdrawDrawer";
+import { PiHandWithdrawBold, PiHandWithdrawFill } from "react-icons/pi";
 
 export function InventoryTable() {
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [filteredItems, setFilteredItems] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [drawerOpened, setDrawerOpened] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
 
   useEffect(() => {
     async function loadInventory() {
@@ -34,7 +38,7 @@ export function InventoryTable() {
     const filtered = items.filter(
       (item) =>
         item.name.toLowerCase().includes(filters.name.toLowerCase()) &&
-        item.weight.toString().includes(filters.weight)
+        item.weight.toString().includes(filters.weight),
     );
     setFilteredItems(filtered);
   };
@@ -45,12 +49,16 @@ export function InventoryTable() {
     <>
       <InventoryFilter onFilter={handleFilter} />
       <ScrollArea>
-        <Table dir="rtl" className="w-full text-center bg-white rounded-lg shadow-md">
+        <Table
+          dir="rtl"
+          className="w-full rounded-lg bg-white text-center shadow-md"
+        >
           <Table.Thead>
             <Table.Tr>
-              <Table.Th style={{textAlign: "center"}}>الاسم</Table.Th>
-              <Table.Th style={{textAlign: "center"}}>الوزن (كغ)</Table.Th>
-              <Table.Th style={{textAlign: "center"}}>الكمية</Table.Th>
+              <Table.Th style={{ textAlign: "center" }}>الاسم</Table.Th>
+              <Table.Th style={{ textAlign: "center" }}>الوزن (كغ)</Table.Th>
+              <Table.Th style={{ textAlign: "center" }}>الكمية</Table.Th>
+              <Table.Th style={{ textAlign: "center" }}>سحب</Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
@@ -59,11 +67,37 @@ export function InventoryTable() {
                 <Table.Td>{item.name}</Table.Td>
                 <Table.Td>{item.weight}</Table.Td>
                 <Table.Td>{item.quantity}</Table.Td>
+                <Table.Td>
+                  <Group justify="center">
+                    <Button
+                      size="xs"
+                      color="orange"
+                      variant="light"
+                      onClick={() => {
+                        setSelectedItem(item);
+                        setDrawerOpened(true);
+                      }}
+                    >
+                      <PiHandWithdrawBold  size={22} />
+                    </Button>
+                    
+                  </Group>
+                </Table.Td>
               </Table.Tr>
             ))}
           </Table.Tbody>
         </Table>
       </ScrollArea>
+      <InventoryWithdrawDrawer
+        opened={drawerOpened}
+        onClose={() => setDrawerOpened(false)}
+        item={selectedItem}
+        onSuccess={async () => {
+          const data = await getInventoryItems();
+          setItems(data);
+          setFilteredItems(data);
+        }}
+      />
     </>
   );
 }
