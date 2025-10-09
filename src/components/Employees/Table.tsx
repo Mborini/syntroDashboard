@@ -155,12 +155,12 @@ export function EmployeesTable() {
                   <Table.Td>{employee.address}</Table.Td>
                 <Table.Td>
         {employee.start_date
-          ? new Date(employee.start_date).toLocaleDateString("en-GB")
+          ? new Date(employee.start_date).toLocaleDateString("ar-EG")
           : "-"}
       </Table.Td>
       <Table.Td>
         {employee.end_date
-          ? new Date(employee.end_date).toLocaleDateString("en-GB")
+          ? new Date(employee.end_date).toLocaleDateString("ar-EG")
           : "-"}
       </Table.Td>
                   <Table.Td>{employee.salary}</Table.Td>

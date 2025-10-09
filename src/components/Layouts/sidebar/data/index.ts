@@ -116,7 +116,7 @@ export const NAV_DATA: NavSection[] = [
           },
           {
             title: "مستودع الانتاج ",
-            url: "/dashboard/inventories/InventoryProduction",
+            url: "/dashboard/inventories/WarehouseTable",
             icon: DoorClosed,
             items: [],
           },
