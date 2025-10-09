@@ -16,36 +16,38 @@ import { Toast } from "@/lib/toast";
 import { TableSkeleton } from "../Common/skeleton";
 
 import { InvoiceDetailsModal } from "./InvoiceDetailsModal";
-import { PurchaseInvoiceDrawer } from "./PurchaseInvoiceDrawer";
+import { SalesInvoiceDrawer } from "./PurchaseInvoiceDrawer";
 import {
-  CreatePurchaseInvoiceDTO,
-  PurchaseInvoice,
-  UpdatePurchaseInvoiceDTO,
-} from "@/types/purchaseInvoice";
-import {
-  createPurchaseInvoice,
-  deletePurchaseInvoice,
-  getPurchaseInvoices,
-  updatePurchaseInvoice,
-} from "@/services/purchaseInvoiceServices";
-import { InvoiceFilter } from "./InvoiceFilter";
+  getSalesInvoices,
+  deleteSalesInvoice,
+  updateSalesInvoice,
+  createSalesInvoice,
+} from "@/services/salesInvoiceServices";
 
-export function PurchaseInvoiceTable() {
-  const [invoices, setInvoices] = useState<PurchaseInvoice[]>([]);
-  const [filteredInvoices, setFilteredInvoices] = useState<PurchaseInvoice[]>(
-    [],
-  );
+import { InvoiceFilter } from "./InvoiceFilter";
+import {
+  CreateSalesInvoiceDTO,
+  SalesInvoice,
+  UpdateSalesInvoiceDTO,
+} from "@/types/salesInvoice";
+
+export function SalesInvoiceTable() {
+  const [invoices, setInvoices] = useState<SalesInvoice[]>([]);
+  const [filteredInvoices, setFilteredInvoices] = useState<SalesInvoice[]>([]);
   const [loading, setLoading] = useState(true);
   const [drawerOpened, setDrawerOpened] = useState(false);
-  const [selectedInvoice, setSelectedInvoice] =
-    useState<PurchaseInvoice | null>(null);
-  const [modalOpened, setModalOpened] = useState(false);
-  const [invoiceToDelete, setInvoiceToDelete] =
-    useState<PurchaseInvoice | null>(null);
-  const [detailsOpened, setDetailsOpened] = useState(false);
-  const [invoiceDetails, setInvoiceDetails] = useState<PurchaseInvoice | null>(
+  const [selectedInvoice, setSelectedInvoice] = useState<SalesInvoice | null>(
     null,
   );
+  const [modalOpened, setModalOpened] = useState(false);
+  const [invoiceToDelete, setInvoiceToDelete] = useState<SalesInvoice | null>(
+    null,
+  );
+  const [detailsOpened, setDetailsOpened] = useState(false);
+  const [invoiceDetails, setInvoiceDetails] = useState<SalesInvoice | null>(
+    null,
+  );
+
   const statusTextMap: Record<number, string> = {
     1: "ذمم",
     2: "مدفوع جزئي",
@@ -55,13 +57,12 @@ export function PurchaseInvoiceTable() {
   const loadInvoices = async () => {
     setLoading(true);
     try {
-      const data = await getPurchaseInvoices();
-      console.log(data);
+      const data = await getSalesInvoices();
       setInvoices(data);
       setFilteredInvoices(data);
     } catch (error) {
       console.error(error);
-      Toast.error("Failed to load purchase invoices");
+      Toast.error("فشل جلب الفواتير");
     } finally {
       setLoading(false);
     }
@@ -72,68 +73,110 @@ export function PurchaseInvoiceTable() {
   }, []);
 
   const handleSubmit = async (
-    data: CreatePurchaseInvoiceDTO | UpdatePurchaseInvoiceDTO,
+    data: CreateSalesInvoiceDTO | UpdateSalesInvoiceDTO,
   ) => {
     try {
       if (selectedInvoice) {
-        await updatePurchaseInvoice(
-          selectedInvoice.id,
-          data as UpdatePurchaseInvoiceDTO,
-        );
-        Toast.success("Invoice updated successfully");
+        // استخدام الدالة من السيرفس
+        await updateSalesInvoice(selectedInvoice.id, data);
+        Toast.success("تم تعديل الفاتورة بنجاح");
       } else {
-        await createPurchaseInvoice(data as CreatePurchaseInvoiceDTO);
-        Toast.success("Invoice created successfully");
+        await createSalesInvoice(data);
+        Toast.success("تم إنشاء الفاتورة بنجاح");
       }
       await loadInvoices();
       setDrawerOpened(false);
       setSelectedInvoice(null);
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      Toast.error("Failed to save invoice");
+      Toast.error(error.message || "فشل حفظ الفاتورة");
     }
   };
 
-  const handleDeleteClick = (inv: PurchaseInvoice) => {
+  const handleConfirmDelete = async () => {
+    if (!invoiceToDelete) return;
+    try {
+      await deleteSalesInvoice(invoiceToDelete.id);
+      setInvoices((prev) => prev.filter((c) => c.id !== invoiceToDelete.id));
+      setFilteredInvoices((prev) =>
+        prev.filter((c) => c.id !== invoiceToDelete.id),
+      );
+      setModalOpened(false);
+      Toast.success("تم حذف الفاتورة بنجاح");
+      await loadInvoices();
+    } catch (error: any) {
+      console.error(error);
+      Toast.error(error.message || "فشل حذف الفاتورة");
+    }
+  };
+
+  const handleDeleteClick = (inv: SalesInvoice) => {
     setInvoiceToDelete(inv);
     setModalOpened(true);
   };
 
-const handleConfirmDelete = async () => {
-  if (!invoiceToDelete) return;
-  try {
-    await deletePurchaseInvoice(invoiceToDelete.id);
-    setInvoices(prev => prev.filter(c => c.id !== invoiceToDelete.id));
-    setFilteredInvoices(prev => prev.filter(c => c.id !== invoiceToDelete.id));
-    setModalOpened(false);
-    Toast.success("Invoice deleted successfully");
-  } catch (error: any) {
-    console.error(error);
-
-    if (error?.missingItems) {
-      const itemsList = error.missingItems
-        .map((i: any) => `${i.name}: مطلوب ${i.requiredQty}, موجود ${i.availableQty}`)
-        .join("\n");
-      Toast.error(`يجب إعادة الأصناف التالية إلى المستودع أولًا:\n${itemsList}`);
-    } else {
-      Toast.error(error.message || "Failed to delete invoice");
+  // داخل SalesInvoiceTable
+  const handleFilter = ({
+    invoiceNo,
+    customer,
+    itemName,
+    startDate,
+    endDate,
+    status,
+  }: {
+    invoiceNo: string;
+    customer: string;
+    itemName: string;
+    startDate: string;
+    endDate: string;
+    status: string;
+  }) => {
+    let filtered = [...invoices];
+    if (itemName.trim()) {
+      filtered = filtered.filter((inv) =>
+        inv.items.some((i) =>
+          i.item_name?.toLowerCase().includes(itemName.trim().toLowerCase()),
+        ),
+      );
     }
-  }
-};
 
-  const handleFilter = (query: string) => {
-    const q = query.trim().toLowerCase();
-    if (!q) {
-      setFilteredInvoices(invoices);
-      return;
+    if (invoiceNo.trim()) {
+      filtered = filtered.filter((inv) =>
+        inv.invoice_no.toString().includes(invoiceNo.trim()),
+      );
     }
-    setFilteredInvoices(
-      invoices.filter(
-        (inv) =>
-          inv.invoice_no.toLowerCase().includes(q) ||
-          (inv.supplier || "").toLowerCase().includes(q),
-      ),
-    );
+
+    if (customer.trim()) {``
+      filtered = filtered.filter((inv) =>
+        inv.customer_name
+          ?.toLowerCase()
+          .includes(customer.trim().toLowerCase())
+      );
+    }
+
+    if (itemName.trim()) {
+      filtered = filtered.filter((inv) =>
+        inv.items.some((i) =>
+          i.item_name?.toLowerCase().includes(itemName.trim().toLowerCase()),
+        ),
+      );
+    }
+
+    if (startDate) {
+      const start = new Date(startDate);
+      filtered = filtered.filter((inv) => new Date(inv.invoice_date) >= start);
+    }
+
+    if (endDate) {
+      const end = new Date(endDate);
+      filtered = filtered.filter((inv) => new Date(inv.invoice_date) <= end);
+    }
+
+    if (status) {
+      filtered = filtered.filter((inv) => inv.status.toString() === status);
+    }
+
+    setFilteredInvoices(filtered);
   };
 
   if (loading) return <TableSkeleton columns={6} />;
@@ -142,7 +185,7 @@ const handleConfirmDelete = async () => {
     <>
       <Group justify="space-between" mb="sm">
         <Button
-          size="xm"
+          size="sm"
           radius="xl"
           color="green"
           variant="light"
@@ -151,66 +194,12 @@ const handleConfirmDelete = async () => {
             setDrawerOpened(true);
           }}
         >
-          {" "}
           فاتورة جديدة <Plus size={16} />
         </Button>
 
-        <InvoiceFilter
-          onFilter={({
-            invoiceNo,
-            supplier,
-            itemName,
-            startDate,
-            endDate,
-            status,
-          }) => {
-            setFilteredInvoices(
-              invoices.filter((inv) => {
-                const matchesInvoiceNo = inv.invoice_no
-                  .toLowerCase()
-                  .includes(invoiceNo.trim().toLowerCase());
-                const matchesSupplier = (inv.supplier || "")
-                  .toLowerCase()
-                  .includes(supplier.trim().toLowerCase());
-
-                const invoiceDate = new Date(inv.invoice_date);
-                invoiceDate.setHours(0, 0, 0, 0);
-
-                const start = startDate ? new Date(startDate) : null;
-                if (start) start.setHours(0, 0, 0, 0);
-
-                const end = endDate ? new Date(endDate) : null;
-                if (end) end.setHours(0, 0, 0, 0);
-
-                const matchesStartDate = start ? invoiceDate >= start : true;
-                const matchesEndDate = end ? invoiceDate <= end : true;
-
-                const matchesItemName = itemName
-                  ? inv.items.some((item) =>
-                      typeof item.name === "string" &&
-                        item.name
-                          .toLowerCase()
-                          .includes(itemName.trim().toLowerCase()),
-                    )
-                  : true;
-
-                const matchesStatus = status
-                  ? String(inv.status) === status
-                  : true;
-
-                return (
-                  matchesInvoiceNo &&
-                  matchesSupplier &&
-                  matchesStartDate &&
-                  matchesEndDate &&
-                  matchesItemName &&
-                  matchesStatus
-                );
-              }),
-            );
-          }}
-        />
-        {filteredInvoices.length > 0 && (
+        <InvoiceFilter onFilter={handleFilter} />
+      </Group>
+ {filteredInvoices.length > 0 && (
           <Table
             dir="rtl"
             withTableBorder
@@ -237,20 +226,14 @@ const handleConfirmDelete = async () => {
 
                 <Table.Td style={{ textAlign: "center" }}>
                   {filteredInvoices
-                    .reduce(
-                      (sum, inv) =>
-                        sum +
-                        inv.items.reduce(
-                          (s, item) =>
-                            s + Number(item.qty) * Number(item.price),
-                          0,
-                        ),
-                      0,
-                    )
-                    .toLocaleString(undefined, {
-                      style: "currency",
-                      currency: "JOD",
-                    })}
+  .reduce((sum, inv) => sum + (Number(inv.grand_total) || 0), 0)
+  .toLocaleString(undefined, {
+    style: "currency",
+    currency: "JOD",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}
+
                 </Table.Td>
 
                 <Table.Td style={{ textAlign: "center" }}>
@@ -259,6 +242,8 @@ const handleConfirmDelete = async () => {
                     .toLocaleString(undefined, {
                       style: "currency",
                       currency: "JOD",
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
                     })}
                 </Table.Td>
 
@@ -271,25 +256,25 @@ const handleConfirmDelete = async () => {
                     .toLocaleString(undefined, {
                       style: "currency",
                       currency: "JOD",
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
                     })}
                 </Table.Td>
               </Table.Tr>
             </Table.Tbody>
           </Table>
         )}
-      </Group>
-
       <ScrollArea mt="md">
         <Table
           dir="rtl"
-          className="w-full rounded-lg bg-white text-center shadow-md dark:bg-gray-dark dark:shadow-card"
+          className="w-full rounded-lg bg-white text-center shadow-md"
         >
-          <Table.Thead className="dark:bg-gray-darker bg-blue-50">
-            <Table.Tr className="h-12 justify-center text-center">
+          <Table.Thead className="bg-blue-50">
+            <Table.Tr>
               <Table.Th style={{ textAlign: "center" }}>رقم الفاتورة</Table.Th>
-              <Table.Th style={{ textAlign: "center" }}>المورد</Table.Th>
+              <Table.Th style={{ textAlign: "center" }}>الزبون</Table.Th>
               <Table.Th style={{ textAlign: "center" }}>التاريخ</Table.Th>
-              <Table.Th style={{ textAlign: "center" }}>الأصناف</Table.Th>
+              <Table.Th style={{ textAlign: "center" }}>عدد الأصناف</Table.Th>
               <Table.Th style={{ textAlign: "center" }}>
                 الإجمالي الكلي
               </Table.Th>
@@ -302,30 +287,18 @@ const handleConfirmDelete = async () => {
 
           <Table.Tbody>
             {filteredInvoices.map((inv) => {
-              const grandTotal = inv.items.reduce(
-                (sum, item) => sum + Number(item.qty) * Number(item.price),
-                0,
-              );
-
               const numericStatus = Number(inv.status);
+
               return (
-                <Table.Tr
-                  key={inv.id}
-                  className="h-12 cursor-pointer hover:bg-gray-100"
-                >
+                <Table.Tr key={inv.id} className="h-12 hover:bg-gray-100">
                   <Table.Td>{inv.invoice_no}</Table.Td>
-                  <Table.Td>{inv.supplier || "-"}</Table.Td>
+                  <Table.Td>{inv.customer_name}</Table.Td>
                   <Table.Td>
                     {new Date(inv.invoice_date).toLocaleDateString()}
                   </Table.Td>
+                  <Table.Td> ({inv.items.length}) صنف </Table.Td>
                   <Table.Td>
-                    <Text dir="rtl" size="sm">
-                      {" "}
-                      ({inv.items.length}) صنف{" "}
-                    </Text>
-                  </Table.Td>
-                  <Table.Td>
-                    {grandTotal.toLocaleString(undefined, {
+                    {(inv.grand_total || 0).toLocaleString(undefined, {
                       style: "currency",
                       currency: "JOD",
                     })}
@@ -345,27 +318,22 @@ const handleConfirmDelete = async () => {
                   <Table.Td>
                     <Badge
                       variant="light"
-                      className="w-20 text-start align-top"
                       color={
                         numericStatus === 3
                           ? "green"
                           : numericStatus === 2
                             ? "yellow"
-                            : numericStatus === 1
-                              ? "red"
-                              : "gray"
+                            : "red"
                       }
                     >
                       {statusTextMap[numericStatus]}
                     </Badge>
                   </Table.Td>
-
                   <Table.Td>
                     <Group className="justify-center" gap="xs">
                       <ActionIcon
-                                            radius="xl"
-
-                        variant="subtle"
+                        radius="xl"
+                        variant="light"
                         color="blue"
                         onClick={() => {
                           setInvoiceDetails(inv);
@@ -375,12 +343,10 @@ const handleConfirmDelete = async () => {
                         <EyeIcon size={18} />
                       </ActionIcon>
                       <ActionIcon
-                                            radius="xl"
-
-                        variant="subtle"
+                        radius="xl"
+                        variant="light"
                         color="orange"
-                        onClick={(e) => {
-                          e.stopPropagation();
+                        onClick={() => {
                           setSelectedInvoice(inv);
                           setDrawerOpened(true);
                         }}
@@ -388,14 +354,10 @@ const handleConfirmDelete = async () => {
                         <PencilIcon size={18} />
                       </ActionIcon>
                       <ActionIcon
-                                            radius="xl"
-
-                        variant="subtle"
+                        radius="xl"
+                        variant="light"
                         color="red"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteClick(inv);
-                        }}
+                        onClick={() => handleDeleteClick(inv)}
                       >
                         <Trash2 size={18} />
                       </ActionIcon>
@@ -408,7 +370,7 @@ const handleConfirmDelete = async () => {
         </Table>
       </ScrollArea>
 
-      <PurchaseInvoiceDrawer
+      <SalesInvoiceDrawer
         opened={drawerOpened}
         onClose={() => {
           setDrawerOpened(false);
@@ -428,8 +390,8 @@ const handleConfirmDelete = async () => {
         opened={modalOpened}
         onClose={() => setModalOpened(false)}
         onConfirm={handleConfirmDelete}
-        title="Delete Invoice"
-        message="Are you sure you want to delete this invoice?"
+        title="حذف الفاتورة"
+        message="هل أنت متأكد أنك تريد حذف هذه الفاتورة؟"
         color="red"
       />
     </>

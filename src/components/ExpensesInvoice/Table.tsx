@@ -17,10 +17,18 @@ import { TableSkeleton } from "../Common/skeleton";
 
 import { InvoiceDetailsModal } from "./InvoiceDetailsModal";
 
-
 import { InvoiceFilter } from "./InvoiceFilter";
-import { CreateExpensesInvoiceDTO, ExpensesInvoice, UpdateExpensesInvoiceDTO } from "@/types/ExpensesInvoice";
-import { createExpensesInvoice, deleteExpensesInvoice, getExpensesInvoices, updateExpensesInvoice } from "@/services/ExpensesInvoiceServices";
+import {
+  CreateExpensesInvoiceDTO,
+  ExpensesInvoice,
+  UpdateExpensesInvoiceDTO,
+} from "@/types/ExpensesInvoice";
+import {
+  createExpensesInvoice,
+  deleteExpensesInvoice,
+  getExpensesInvoices,
+  updateExpensesInvoice,
+} from "@/services/ExpensesInvoiceServices";
 import { ExpensesInvoiceDrawer } from "./InvoiceDrawer";
 
 export function ExpensesInvoiceTable() {
@@ -126,19 +134,19 @@ export function ExpensesInvoiceTable() {
 
   return (
     <>
-      <Group  justify="space-between" mb="sm">
+      <Group justify="space-between" mb="sm">
         <Button
-        size="xm"
+          size="xm"
           radius="xl"
           color="green"
           variant="light"
-          
           onClick={() => {
             setSelectedInvoice(null);
             setDrawerOpened(true);
           }}
-        > فاتورة جديدة{" "}<Plus size={16} />
-         
+        >
+          {" "}
+          فاتورة جديدة <Plus size={16} />
         </Button>
 
         <InvoiceFilter
@@ -196,13 +204,10 @@ export function ExpensesInvoiceTable() {
           }}
         />
 
-
-        
         {filteredInvoices.length > 0 && (
           <Table
             dir="rtl"
             withTableBorder
-            
             className="mt-4 rounded-lg bg-white shadow-md"
           >
             <Table.Thead className="bg-blue-50">
@@ -213,12 +218,8 @@ export function ExpensesInvoiceTable() {
                 <Table.Th style={{ textAlign: "center" }}>
                   الإجمالي الكلي
                 </Table.Th>
-                <Table.Th style={{ textAlign: "center" }}>
-                   المدفوع
-                </Table.Th>
-                <Table.Th style={{ textAlign: "center" }}>
-                   ذمم
-                </Table.Th>
+                <Table.Th style={{ textAlign: "center" }}>المدفوع</Table.Th>
+                <Table.Th style={{ textAlign: "center" }}>ذمم</Table.Th>
               </Table.Tr>
             </Table.Thead>
 
@@ -283,7 +284,9 @@ export function ExpensesInvoiceTable() {
               <Table.Th style={{ textAlign: "center" }}>المورد</Table.Th>
               <Table.Th style={{ textAlign: "center" }}>التاريخ</Table.Th>
               <Table.Th style={{ textAlign: "center" }}>الأصناف</Table.Th>
-              <Table.Th style={{ textAlign: "center" }}>الإجمالي الكلي</Table.Th>
+              <Table.Th style={{ textAlign: "center" }}>
+                الإجمالي الكلي
+              </Table.Th>
               <Table.Th style={{ textAlign: "center" }}>المدفوع</Table.Th>
               <Table.Th style={{ textAlign: "center" }}>الباقي</Table.Th>
               <Table.Th style={{ textAlign: "center" }}>الحالة</Table.Th>
@@ -303,7 +306,6 @@ export function ExpensesInvoiceTable() {
                 <Table.Tr
                   key={inv.id}
                   className="h-12 cursor-pointer hover:bg-gray-100"
-                 
                 >
                   <Table.Td>{inv.invoice_no}</Table.Td>
                   <Table.Td>{inv.supplier || "-"}</Table.Td>
@@ -354,18 +356,20 @@ export function ExpensesInvoiceTable() {
 
                   <Table.Td>
                     <Group className="justify-center" gap="xs">
-                       <ActionIcon
-                        variant="subtle"
+                      <ActionIcon
+                        radius="xl"
+                        variant="light"
                         color="blue"
-                       onClick={() => {
-                    setInvoiceDetails(inv);
-                    setDetailsOpened(true);
-                  }}
+                        onClick={() => {
+                          setInvoiceDetails(inv);
+                          setDetailsOpened(true);
+                        }}
                       >
                         <EyeIcon size={18} />
                       </ActionIcon>
                       <ActionIcon
-                        variant="subtle"
+                        radius="xl"
+                        variant="light"
                         color="orange"
                         onClick={(e) => {
                           e.stopPropagation();
@@ -376,7 +380,8 @@ export function ExpensesInvoiceTable() {
                         <PencilIcon size={18} />
                       </ActionIcon>
                       <ActionIcon
-                        variant="subtle"
+                        radius="xl"
+                        variant="light"
                         color="red"
                         onClick={(e) => {
                           e.stopPropagation();

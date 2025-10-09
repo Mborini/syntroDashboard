@@ -15,8 +15,8 @@ import {
   updateWarehouseItem,
 } from "@/services/warehouseServices";
 import { WarehouseItem } from "@/types/warehouse";
-import { getSalesItems } from "@/services/salestemServices copy";
 import { SalesItem } from "@/types/salesItem";
+import { getSalesItems } from "@/services/salesItemServices";
 
 type Props = {
   opened: boolean;

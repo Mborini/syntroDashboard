@@ -71,6 +71,12 @@ export const NAV_DATA: NavSection[] = [
             icon: DoorClosed,
             items: [],
           },
+          {
+            title: "مبيعات",
+            url: "/dashboard/invoices/sales",
+            icon: DoorClosed,
+            items: [],
+          },
         ],
       },
       {

@@ -13,10 +13,10 @@ import { TableSkeleton } from "../Common/skeleton";
 import ConfirmModal from "../Common/ConfirmModal";
 import { Toast } from "@/lib/toast";
 import { CreateSalesItemDTO, SalesItem, UpdateSalesItemDTO } from "@/types/salesItem";
-import { createSalesItem, deleteSalesItem, getSalesItems, updateSalesItem } from "@/services/salestemServices copy";
 import { SalesItemDrawer } from "./PurchaseItemDrawer";
 import { SalesItemFilter } from "./PurchaseItemFilter";
 import { PiPlusBold } from "react-icons/pi";
+import { createSalesItem, deleteSalesItem, getSalesItems, updateSalesItem } from "@/services/salesItemServices";
 
 
 export function SalesItemsTable() {
