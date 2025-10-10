@@ -5,13 +5,13 @@ import { Metadata } from "next";
 import { Suspense } from "react";
 
 export const metadata: Metadata = {
-  title: "الزبائن",
+  title: "العملاء",
 };
 
 export default async function customersPage() {
   return (
     <>
-      <Breadcrumb pageName="الزبائن" />
+      <Breadcrumb pageName="العملاء" />
 
       <div className="space-y-10">
         <CustomersTable />

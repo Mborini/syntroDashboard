@@ -12,15 +12,23 @@ type Props = {
   onSuccess: () => void;
 };
 
-export function InventoryWithdrawDrawer({ opened, onClose, item, onSuccess }: Props) {
+export function InventoryWithdrawDrawer({
+  opened,
+  onClose,
+  item,
+  onSuccess,
+}: Props) {
   const [quantity, setQuantity] = useState<number>(0);
   const [notes, setNotes] = useState("");
+
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleWithdraw = async () => {
     if (!item) return;
     if (quantity <= 0) return Toast.error("يرجى إدخال كمية صحيحة");
 
     try {
+      setIsSaving(true); // 🔹 تعطيل الزر أثناء العملية
       await withdrawFromInventory({
         item_id: item.item_id,
         quantity,
@@ -34,15 +42,27 @@ export function InventoryWithdrawDrawer({ opened, onClose, item, onSuccess }: Pr
     } catch (error) {
       console.error(error);
       Toast.error("فشل السحب من المستودع");
+    } finally {
+      setIsSaving(false); // 🔹 إعادة تمكين الزر بعد الانتهاء
     }
   };
 
   return (
-    <Drawer opened={opened} onClose={onClose} position="right" title="سحب من المستودع" size="sm">
+    <Drawer
+      opened={opened}
+      onClose={onClose}
+      position="right"
+      title="سحب من المستودع"
+      size="sm"
+    >
       <div dir="rtl" className="flex flex-col gap-4">
-        <p>الصنف: <strong>{item?.name}</strong></p>
+        <p>
+          الصنف: <strong>{item?.name}</strong>
+        </p>
 
         <NumberInput
+          variant="filled"
+          radius="md"
           label="الكمية المسحوبة"
           min={1}
           value={quantity}
@@ -50,14 +70,33 @@ export function InventoryWithdrawDrawer({ opened, onClose, item, onSuccess }: Pr
         />
 
         <Textarea
+          variant="filled"
+          radius="md"
           label="ملاحظات"
           value={notes}
           onChange={(e) => setNotes(e.currentTarget.value)}
         />
-
-        <Button color="orange" onClick={handleWithdraw} fullWidth>
-          سحب
-        </Button>
+        <div className="mt-4 flex justify-center gap-2">
+          <Button
+            color="orange"
+            variant="light"
+            radius={"md"}
+            onClick={handleWithdraw}
+            fullWidth
+            disabled={isSaving}
+          >
+            {isSaving ? "جارٍ السحب..." : "سحب"}
+          </Button>
+          <Button
+            color="red"
+            variant="light"
+            radius={"md"}
+            onClick={onClose}
+            fullWidth
+          >
+            إلغاء
+          </Button>
+        </div>
       </div>
     </Drawer>
   );

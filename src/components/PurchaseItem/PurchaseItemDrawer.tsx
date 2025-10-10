@@ -7,7 +7,13 @@ import {
   PurchaseItem,
   PurchaseItemDrawerProps,
 } from "@/types/purchaseItem";
-import { Button, Drawer, TextInput, Textarea, NumberInput } from "@mantine/core";
+import {
+  Button,
+  Drawer,
+  TextInput,
+  Textarea,
+  NumberInput,
+} from "@mantine/core";
 import { useState, useEffect } from "react";
 
 export function PurchaseItemDrawer({
@@ -16,11 +22,14 @@ export function PurchaseItemDrawer({
   item,
   onSubmit,
 }: PurchaseItemDrawerProps) {
-  const [form, setForm] = useState<CreatePurchaseItemDTO | UpdatePurchaseItemDTO>({
+  const [form, setForm] = useState<
+    CreatePurchaseItemDTO | UpdatePurchaseItemDTO
+  >({
     name: "",
     weight: "",
     notes: "",
   });
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (item) {
@@ -38,12 +47,21 @@ export function PurchaseItemDrawer({
     }
   }, [item, opened]);
 
-  const handleSubmit = () => {
-    if (!form.name ) {
-      return Toast.error("يرجى إدخال الاسم !");
+  const handleSubmit = async () => {
+    if (!form.name || !form.weight) {
+      return Toast.error("يرجى إدخال جميع الحقول !");
     }
-    onSubmit(form);
-    onClose();
+
+    try {
+      setIsSaving(true); // 🔹 تعطيل الزر أثناء العملية
+      await onSubmit(form); // إذا كانت العملية async
+      onClose();
+    } catch (error) {
+      console.error(error);
+      Toast.error("حدث خطأ أثناء الحفظ");
+    } finally {
+      setIsSaving(false); // 🔹 إعادة تمكين الزر بعد الانتهاء
+    }
   };
 
   return (
@@ -71,7 +89,6 @@ export function PurchaseItemDrawer({
           onChange={(e) => setForm({ ...form, weight: e.currentTarget.value })}
         />
 
-
         <Textarea
           variant="filled"
           radius="md"
@@ -86,8 +103,15 @@ export function PurchaseItemDrawer({
             color={item ? "orange" : "green"}
             onClick={handleSubmit}
             fullWidth
+            disabled={isSaving} // 🔹 تعطيل أثناء الحفظ
           >
-            {item ? "تحديث" : "إضافة"}
+            {isSaving
+              ? item
+                ? "جارٍ التحديث..."
+                : "جارٍ الإضافة..."
+              : item
+                ? "تحديث"
+                : "إضافة"}
           </Button>
           <Button color="red" variant="light" onClick={onClose} fullWidth>
             إلغاء

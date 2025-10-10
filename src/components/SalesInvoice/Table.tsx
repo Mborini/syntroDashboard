@@ -78,7 +78,7 @@ export function SalesInvoiceTable() {
     try {
       if (selectedInvoice) {
         // استخدام الدالة من السيرفس
-        await updateSalesInvoice(selectedInvoice.id, data);
+        await updateSalesInvoice(selectedInvoice.id, data as any);
         Toast.success("تم تعديل الفاتورة بنجاح");
       } else {
         await createSalesInvoice(data);
@@ -146,11 +146,12 @@ export function SalesInvoiceTable() {
       );
     }
 
-    if (customer.trim()) {``
+    if (customer.trim()) {
+      ``;
       filtered = filtered.filter((inv) =>
         inv.customer_name
           ?.toLowerCase()
-          .includes(customer.trim().toLowerCase())
+          .includes(customer.trim().toLowerCase()),
       );
     }
 
@@ -199,71 +200,68 @@ export function SalesInvoiceTable() {
 
         <InvoiceFilter onFilter={handleFilter} />
       </Group>
- {filteredInvoices.length > 0 && (
-          <Table
-            dir="rtl"
-            withTableBorder
-            className="mt-4 rounded-lg bg-white shadow-md"
-          >
-            <Table.Thead className="bg-blue-50">
-              <Table.Tr>
-                <Table.Th style={{ textAlign: "center" }}>
-                  عدد الفواتير
-                </Table.Th>
-                <Table.Th style={{ textAlign: "center" }}>
-                  الإجمالي الكلي
-                </Table.Th>
-                <Table.Th style={{ textAlign: "center" }}>المدفوع</Table.Th>
-                <Table.Th style={{ textAlign: "center" }}>ذمم</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
+      {filteredInvoices.length > 0 && (
+        <Table
+          dir="rtl"
+          withTableBorder
+          className="mt-4 rounded-lg bg-white shadow-md"
+        >
+          <Table.Thead className="bg-blue-50">
+            <Table.Tr>
+              <Table.Th style={{ textAlign: "center" }}>عدد الفواتير</Table.Th>
+              <Table.Th style={{ textAlign: "center" }}>
+                الإجمالي الكلي
+              </Table.Th>
+              <Table.Th style={{ textAlign: "center" }}>المدفوع</Table.Th>
+              <Table.Th style={{ textAlign: "center" }}>ذمم</Table.Th>
+            </Table.Tr>
+          </Table.Thead>
 
-            <Table.Tbody>
-              <Table.Tr>
-                <Table.Td style={{ textAlign: "center" }}>
-                  {filteredInvoices.length}
-                </Table.Td>
+          <Table.Tbody>
+            <Table.Tr>
+              <Table.Td style={{ textAlign: "center" }}>
+                {filteredInvoices.length}
+              </Table.Td>
 
-                <Table.Td style={{ textAlign: "center" }}>
-                  {filteredInvoices
-  .reduce((sum, inv) => sum + (Number(inv.grand_total) || 0), 0)
-  .toLocaleString(undefined, {
-    style: "currency",
-    currency: "JOD",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}
+              <Table.Td style={{ textAlign: "center" }}>
+                {filteredInvoices
+                  .reduce((sum, inv) => sum + (Number(inv.grand_total) || 0), 0)
+                  .toLocaleString(undefined, {
+                    style: "currency",
+                    currency: "JOD",
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+              </Table.Td>
 
-                </Table.Td>
+              <Table.Td style={{ textAlign: "center" }}>
+                {filteredInvoices
+                  .reduce((sum, inv) => sum + Number(inv.paid_amount) || 0, 0)
+                  .toLocaleString(undefined, {
+                    style: "currency",
+                    currency: "JOD",
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+              </Table.Td>
 
-                <Table.Td style={{ textAlign: "center" }}>
-                  {filteredInvoices
-                    .reduce((sum, inv) => sum + Number(inv.paid_amount) || 0, 0)
-                    .toLocaleString(undefined, {
-                      style: "currency",
-                      currency: "JOD",
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                </Table.Td>
-
-                <Table.Td style={{ textAlign: "center" }}>
-                  {filteredInvoices
-                    .reduce(
-                      (sum, inv) => sum + (Number(inv.remaining_amount) || 0),
-                      0,
-                    )
-                    .toLocaleString(undefined, {
-                      style: "currency",
-                      currency: "JOD",
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                </Table.Td>
-              </Table.Tr>
-            </Table.Tbody>
-          </Table>
-        )}
+              <Table.Td style={{ textAlign: "center" }}>
+                {filteredInvoices
+                  .reduce(
+                    (sum, inv) => sum + (Number(inv.remaining_amount) || 0),
+                    0,
+                  )
+                  .toLocaleString(undefined, {
+                    style: "currency",
+                    currency: "JOD",
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+              </Table.Td>
+            </Table.Tr>
+          </Table.Tbody>
+        </Table>
+      )}
       <ScrollArea mt="md">
         <Table
           dir="rtl"
@@ -387,11 +385,12 @@ export function SalesInvoiceTable() {
       />
 
       <ConfirmModal
+      
         opened={modalOpened}
         onClose={() => setModalOpened(false)}
         onConfirm={handleConfirmDelete}
-        title="حذف الفاتورة"
-        message="هل أنت متأكد أنك تريد حذف هذه الفاتورة؟"
+        title="حذف الفاتورة مبيعات"
+        message="سيتم حذف هذه الفاتورة بشكل كامل و ارجاع كميات الاصناف الى مستودع الانتاج , هل انت متأكد من عملية الحذف؟"
         color="red"
       />
     </>

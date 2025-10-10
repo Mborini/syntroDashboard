@@ -17,6 +17,7 @@ import {
 } from "@/types/purchaseInvoice";
 import { getSuppliers } from "@/services/supplierServices";
 import { getPurchaseItems } from "@/services/purchaseItemServices";
+import { Toast } from "@/lib/toast";
 
 type Props = {
   opened: boolean;
@@ -32,7 +33,7 @@ export function PurchaseInvoiceDrawer({
   onSubmit,
 }: Props) {
   const [invoiceNo, setInvoiceNo] = useState("");
-  const [invoiceDate, setInvoiceDate] = useState("");
+  const [invoiceDate, setInvoiceDate] = useState("");const [isSaving, setIsSaving] = useState(false);
   const [items, setItems] = useState<
     { item_id: number; qty: number; price: number }[]
   >([]);
@@ -116,7 +117,9 @@ export function PurchaseInvoiceDrawer({
     مدفوع: 3,
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
+      setIsSaving(true); // 🔹 بدء العملية، تعطيل الزر
+ try {
     const safePaidAmount = Number(paidAmount) || 0;
 
    const roundedItems = items.map((item) => ({
@@ -145,8 +148,14 @@ export function PurchaseInvoiceDrawer({
       remaining_amount: roundedRemainingAmount,
     };
 
-    onSubmit(data);
-  };
+     await onSubmit(data);
+     } catch (error) {
+       console.error(error);
+       Toast.error("حدث خطأ أثناء الحفظ");
+     } finally {
+       setIsSaving(false); // 🔹 إعادة تمكين الزر بعد الانتهاء
+     }
+   };
 
   const isValid =
     invoiceNo.trim() !== "" &&
@@ -301,10 +310,10 @@ export function PurchaseInvoiceDrawer({
           variant={invoice ? "outline" : "light"}
           color={invoice ? "orange" : "green"}
           fullWidth
-          disabled={!isValid}
+          disabled={!isValid || isSaving}
           onClick={handleSave}
         >
-          {invoice ? "تعديل و حفظ" : "حفظ"}
+  {isSaving ? "جارٍ الحفظ..." : invoice ? "تعديل و حفظ" : "حفظ"}
         </Button>
       </div>
     </Drawer>

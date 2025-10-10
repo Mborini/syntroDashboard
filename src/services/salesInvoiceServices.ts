@@ -1,7 +1,7 @@
-import { SalesInvoice } from "@/types/salesInvoice";
+import { SalesInvoice, UpdateSalesInvoiceDTO } from "@/types/salesInvoice";
 import { CreateSalesInvoiceDTO } from "@/types/salesInvoice";
 
-;
+
 
 const API_URL = "/api/salesInvoice/Invoice"; // غيره حسب الـ route عندك
 const availableItemsAPI = "/api/salesInvoice/available-items-warehouse";
@@ -28,15 +28,25 @@ export async function createSalesInvoice(data: CreateSalesInvoiceDTO): Promise<S
   return res.json();
 }
 
-// ✅ تعديل فاتورة موجودة
-export async function updateSalesInvoice(id: number, data: UpdateSalesInvoiceDTO): Promise<SalesInvoice> {
+export async function updateSalesInvoice(
+  id: number,
+  data: UpdateSalesInvoiceDTO
+): Promise<SalesInvoice> {
   const res = await fetch(`${API_URL}/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-  if (!res.ok) throw new Error("فشل تعديل الفاتورة");
-  return res.json();
+
+  const result = await res.json();
+
+  // إذا كانت الاستجابة تحتوي على خطأ أو success=false
+  if (!res.ok || result.success === false) {
+    // هنا ترجع الرسالة لتظهر للمستخدم
+    throw new Error(result.message || "فشل تعديل الفاتورة");
+  }
+
+  return result;
 }
 
 // ✅ حذف فاتورة

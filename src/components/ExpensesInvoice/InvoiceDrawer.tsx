@@ -13,8 +13,13 @@ import {
   Select,
 } from "@mantine/core";
 import { Trash2 } from "lucide-react";
-import { CreateExpensesInvoiceDTO, ExpensesInvoice, UpdateExpensesInvoiceDTO } from "@/types/ExpensesInvoice";
+import {
+  CreateExpensesInvoiceDTO,
+  ExpensesInvoice,
+  UpdateExpensesInvoiceDTO,
+} from "@/types/ExpensesInvoice";
 import { getSuppliers } from "@/services/supplierServices";
+import { Toast } from "@/lib/toast";
 
 type Props = {
   opened: boolean;
@@ -37,10 +42,12 @@ export function ExpensesInvoiceDrawer({
   >([]);
   const [status, setStatus] = useState<"ذمم" | "مدفوع جزئي" | "مدفوع">("ذمم");
   const [paidAmount, setPaidAmount] = useState(0);
-
+  const [isSaving, setIsSaving] = useState(false);
   const grandTotal = items.reduce((sum, i) => sum + i.qty * i.price, 0);
   const remainingAmount = Math.max(grandTotal - paidAmount, 0);
-  const [suppliers, setSuppliers] = useState<{ id: number; name: string }[]>([]);
+  const [suppliers, setSuppliers] = useState<{ id: number; name: string }[]>(
+    [],
+  );
 
   useEffect(() => {
     if (invoice) {
@@ -57,7 +64,7 @@ export function ExpensesInvoiceDrawer({
       setPaidAmount(0);
     }
   }, [invoice, opened]);
- useEffect(() => {
+  useEffect(() => {
     async function loadSuppliers() {
       try {
         const data = await getSuppliers();
@@ -93,46 +100,55 @@ export function ExpensesInvoiceDrawer({
     مدفوع: 3,
   };
 
-const handleSave = () => {
-  // تقريب القيم لعشريتين
-  const roundedItems = items.map((item) => ({
-    ...item,
-    price: Math.round(item.price * 100) / 100,
-    qty: item.qty, // لا داعي لتقريب الكمية لأنها عدد صحيح
-  }));
+  const handleSave = async () => {
+    setIsSaving(true); // 🔹 بدء العملية، تعطيل الزر
+    try {
+      // تقريب القيم لعشريتين
+      const roundedItems = items.map((item) => ({
+        ...item,
+        price: Math.round(item.price * 100) / 100,
+        qty: item.qty, // لا داعي لتقريب الكمية لأنها عدد صحيح
+      }));
 
-  const roundedGrandTotal = Math.round(
-    roundedItems.reduce((sum, i) => sum + i.qty * i.price, 0) * 100
-  ) / 100;
+      const roundedGrandTotal =
+        Math.round(
+          roundedItems.reduce((sum, i) => sum + i.qty * i.price, 0) * 100,
+        ) / 100;
 
-  const roundedPaidAmount = Math.round(paidAmount * 100) / 100;
+      const roundedPaidAmount = Math.round(paidAmount * 100) / 100;
 
-  const roundedRemainingAmount = Math.max(
-    Math.round((roundedGrandTotal - roundedPaidAmount) * 100) / 100,
-    0
-  );
+      const roundedRemainingAmount = Math.max(
+        Math.round((roundedGrandTotal - roundedPaidAmount) * 100) / 100,
+        0,
+      );
 
-  const data: CreateExpensesInvoiceDTO | UpdateExpensesInvoiceDTO = {
-    invoice_no: invoiceNo,
-supplier_id: supplierId,    invoice_date: invoiceDate,
-    items: roundedItems,
-    grand_total: roundedGrandTotal,
-    status: statusMap[status],
-    paid_amount: roundedPaidAmount,
-    remaining_amount: roundedRemainingAmount,
+      const data: CreateExpensesInvoiceDTO | UpdateExpensesInvoiceDTO = {
+        invoice_no: invoiceNo,
+        supplier_id: supplierId,
+        invoice_date: invoiceDate,
+        items: roundedItems,
+        grand_total: roundedGrandTotal,
+        status: statusMap[status],
+        paid_amount: roundedPaidAmount,
+        remaining_amount: roundedRemainingAmount,
+      };
+
+      await onSubmit(data);
+    } catch (error) {
+      console.error(error);
+      Toast.error("حدث خطأ أثناء الحفظ");
+    } finally {
+      setIsSaving(false); // 🔹 إعادة تمكين الزر بعد الانتهاء
+    }
   };
 
-  onSubmit(data);
-};
-
-   const isValid =
-  invoiceNo.trim() !== "" &&
-  supplierId > 0 &&
-  items.length > 0 &&
-  items.every((it) => it.name.trim() !== "" && it.qty > 0 && it.price > 0) &&
-  paidAmount >= 0 &&
-  paidAmount <= grandTotal;
-
+  const isValid =
+    invoiceNo.trim() !== "" &&
+    supplierId > 0 &&
+    items.length > 0 &&
+    items.every((it) => it.name.trim() !== "" && it.qty > 0 && it.price > 0) &&
+    paidAmount >= 0 &&
+    paidAmount <= grandTotal;
 
   return (
     <Drawer
@@ -157,14 +173,17 @@ supplier_id: supplierId,    invoice_date: invoiceDate,
             value={invoiceDate}
             onChange={(e) => setInvoiceDate(e.currentTarget.value)}
           />
-         <Select
-           variant="filled"
-           label="المورد"
-           placeholder="اختر المورد"
-           value={supplierId ? String(supplierId) : ""}
-           onChange={(val) => setSupplierId(val ? Number(val) : 0)}
-           data={suppliers.map((s) => ({ value: String(s.id), label: s.name }))}
-         />
+          <Select
+            variant="filled"
+            label="المورد"
+            placeholder="اختر المورد"
+            value={supplierId ? String(supplierId) : ""}
+            onChange={(val) => setSupplierId(val ? Number(val) : 0)}
+            data={suppliers.map((s) => ({
+              value: String(s.id),
+              label: s.name,
+            }))}
+          />
         </div>
         <Divider />
         <div dir="rtl" className="grid grid-cols-4 text-center font-bold">
@@ -258,10 +277,10 @@ supplier_id: supplierId,    invoice_date: invoiceDate,
           variant={invoice ? "outline" : "light"}
           color={invoice ? "orange" : "green"}
           fullWidth
-          disabled={!isValid}
+          disabled={!isValid||isSaving }
           onClick={handleSave}
         >
-          {invoice ? "تعديل و حفظ" : "حفظ"}
+          {isSaving ? "جارٍ الحفظ..." : invoice ? "تعديل و حفظ" : "حفظ"}
         </Button>
       </div>
     </Drawer>

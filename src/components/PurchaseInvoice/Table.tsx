@@ -428,8 +428,8 @@ const handleConfirmDelete = async () => {
         opened={modalOpened}
         onClose={() => setModalOpened(false)}
         onConfirm={handleConfirmDelete}
-        title="Delete Invoice"
-        message="Are you sure you want to delete this invoice?"
+        title="حذف فاتورة مشتريات"
+        message="سيتم حذف اصناف الفاتورة بشكل كامل بالاضافة الى حذف قيمها من مستودع المواد الاولية بشكل نهائي, هل انت متأكد من عملية الحذف؟"
         color="red"
       />
     </>

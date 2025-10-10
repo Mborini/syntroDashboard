@@ -6,7 +6,7 @@ import {
   SalesItemDrawerProps,
   UpdateSalesItemDTO,
 } from "@/types/salesItem";
-import { Button, Drawer, TextInput, Textarea } from "@mantine/core";
+import { Button, Drawer, NumberInput, TextInput, Textarea } from "@mantine/core";
 import { useState, useEffect } from "react";
 
 export function SalesItemDrawer({
@@ -22,6 +22,7 @@ export function SalesItemDrawer({
     weight: "",
     notes: "",
   });
+const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (item) {
@@ -47,13 +48,21 @@ export function SalesItemDrawer({
   const isDisabled =
     !form.name || !form.weight || !form.sale_price || !form.cost_price;
 
-  const handleSubmit = () => {
-    if (isDisabled) {
-      return Toast.error("يرجى تعبئة جميع الحقول الأساسية قبل الحفظ");
-    }
-    onSubmit(form);
+ const handleSubmit = async () => {
+  if (isDisabled) {
+    return Toast.error("يرجى تعبئة جميع الحقول الأساسية قبل الحفظ");
+  }
+  try {
+    setIsSaving(true); // 🔹 تعطيل الزر أثناء العملية
+    await onSubmit(form); // انتظار العملية إذا كانت async
     onClose();
-  };
+  } catch (error) {
+    console.error(error);
+    Toast.error("حدث خطأ أثناء الحفظ");
+  } finally {
+    setIsSaving(false); // 🔹 إعادة تمكين الزر
+  }
+};
 
   return (
     <Drawer
@@ -71,30 +80,27 @@ export function SalesItemDrawer({
           value={form.name}
           onChange={(e) => setForm({ ...form, name: e.currentTarget.value })}
         />
-        <TextInput
+        <NumberInput
+        min={0}
           variant="filled"
           radius="md"
           label="الوزن (ك)"
           value={form.weight}
-          onChange={(e) => setForm({ ...form, weight: e.currentTarget.value })}
+          onChange={(value) => setForm({ ...form, weight: value !== undefined && value !== null ? String(value) : "" })}
         />
-        <TextInput
+        <NumberInput
           variant="filled"
           radius="md"
           label="سعر التكلفة"
           value={form.cost_price}
-          onChange={(e) =>
-            setForm({ ...form, cost_price: e.currentTarget.value })
-          }
+             onChange={(value) => setForm({ ...form, cost_price: value !== undefined && value !== null ? String(value) : "" })}
         />
-        <TextInput
+        <NumberInput
           variant="filled"
           radius="md"
           label="سعر البيع"
           value={form.sale_price}
-          onChange={(e) =>
-            setForm({ ...form, sale_price: e.currentTarget.value })
-          }
+               onChange={(value) => setForm({ ...form, sale_price: value !== undefined && value !== null ? String(value) : "" })}
         />
         <Textarea
           variant="filled"
@@ -106,14 +112,15 @@ export function SalesItemDrawer({
 
         <div className="mt-4 flex justify-center gap-2">
           <Button
-            variant="light"
-            color={item ? "orange" : "green"}
-            onClick={handleSubmit}
-            fullWidth
-            disabled={isDisabled} // تعطيل الزر إذا كان أي حقل ناقص
-          >
-            {item ? "تحديث" : "إضافة"}
-          </Button>
+  variant="light"
+  color={item ? "orange" : "green"}
+  onClick={handleSubmit}
+  fullWidth
+  disabled={isDisabled || isSaving} // 🔹 تعطيل الزر أثناء الحفظ
+>
+  {isSaving ? (item ? "جارٍ التحديث..." : "جارٍ الإضافة...") : item ? "تحديث" : "إضافة"}
+</Button>
+
           <Button color="red" variant="light" onClick={onClose} fullWidth>
             إلغاء
           </Button>

@@ -15,8 +15,8 @@ export default function ConfirmModal({
   let titleIcon = <OctagonAlertIcon color="red" />;
   if (color === "green") {
     titleIcon = <BadgeCheck color="green" />;
-  } else if (color === "yellow") {
-    titleIcon = <TriangleAlert color="yellow" />;
+  } else if (color === "orange") {
+    titleIcon = <TriangleAlert color="orange" />;
   }
   return (
     <Modal
