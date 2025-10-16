@@ -1,6 +1,6 @@
 import { Employee, CreateEmployeeDTO, UpdateEmployeeDTO } from "@/types/employee";
 
-const API_BASE = "/api/employees";
+const API_BASE = "/api/HR/employees";
 
 export async function getEmployees(): Promise<Employee[]> {
   const res = await fetch(API_BASE);

@@ -5,8 +5,8 @@ import { PencilIcon, Trash2, UserRoundPlus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { GiDoorHandle } from "react-icons/gi";
 
-import { TableSkeleton } from "../Common/skeleton";
-import ConfirmModal from "../Common/ConfirmModal";
+import { TableSkeleton } from "../../Common/skeleton";
+import ConfirmModal from "../../Common/ConfirmModal";
 import { Toast } from "@/lib/toast";
 
 import { AttendanceDrawer } from "./Drawer";

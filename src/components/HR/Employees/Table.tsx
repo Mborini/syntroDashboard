@@ -11,8 +11,8 @@ import {
 import { PencilIcon, Trash2, UserCheck, UserPlus, UserX } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import { TableSkeleton } from "../Common/skeleton";
-import ConfirmModal from "../Common/ConfirmModal";
+import { TableSkeleton } from "../../Common/skeleton";
+import ConfirmModal from "../../Common/ConfirmModal";
 
 import { Toast } from "@/lib/toast";
 import {

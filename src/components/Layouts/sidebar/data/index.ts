@@ -174,14 +174,14 @@ export const NAV_DATA: NavSection[] = [
         items: [
           {
             title: "ادارة الموظفين",
-            url: "/dashboard/employees/management",
+            url: "/dashboard/HR/management",
             icon: FaUsersGear  ,
                         color:"#FB7185",
             items: [],
           },
           {
             title: "الدوام اليومي",
-            url: "/dashboard/employees/attendance",
+            url: "/dashboard/HR/attendance",
             icon: SlCalender,
                         color:"#FB7185",
 

@@ -1,6 +1,6 @@
 // app/tables/page.tsx
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import { EmployeesTable } from "@/components/Employees/Table";
+import { EmployeesTable } from "@/components/HR/Employees/Table";
 
 export default async function EmployeesPage() {
   return (

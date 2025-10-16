@@ -1,5 +1,5 @@
 // app/tables/page.tsx
-import { AttendanceTable } from "@/components/Attendance/Table";
+import { AttendanceTable } from "@/components/HR/Attendance/Table";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { CustomersTable } from "@/components/Customers/Table";
 import { Metadata } from "next";

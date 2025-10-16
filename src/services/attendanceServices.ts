@@ -1,6 +1,6 @@
 import { Attendance, CreateAttendanceDTO, UpdateAttendanceDTO } from "@/types/attendance";
 
-const API_URL = "/api/attendance";
+const API_URL = "/api/HR/attendance";
 
 // جلب جميع سجلات الحضور
 export async function getAttendance(): Promise<Attendance[]> {
