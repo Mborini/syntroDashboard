@@ -121,16 +121,16 @@ export function UserDrawer({
         )}
 
         <div className="mt-4 flex justify-center gap-2">
-          <AppButton
+          <Button
             color={user ? "orange" : "green"}
             onClick={handleSubmit}
             fullWidth
           >
             {user ? "Update" : "Create"}
-          </AppButton>
-          <AppButton color="red" onClick={onClose} fullWidth>
+          </Button>
+          <Button color="red" onClick={onClose} fullWidth>
             Cancel
-          </AppButton>
+          </Button>
         </div>
       </div>
     </Drawer>
