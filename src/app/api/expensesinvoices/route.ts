@@ -21,9 +21,9 @@ export async function GET() {
     client.release();
 
     // نجمع الأصناف مع الفواتير
-    const invoices = invoicesRes.rows.map((invoice) => ({
+    const invoices = invoicesRes.rows.map((invoice:any) => ({
       ...invoice,
-      items: itemsRes.rows.filter((item) => item.invoice_id === invoice.id),
+      items: itemsRes.rows.filter((item:any) => item.invoice_id === invoice.id),
     }));
 
     return NextResponse.json(invoices);
