@@ -1,6 +1,5 @@
 // app/tables/page.tsx
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import { ParentsTable } from "@/components/Parents/Table";
 
 export default async function ParentsPage() {
   return (
@@ -8,7 +7,7 @@ export default async function ParentsPage() {
       <Breadcrumb pageName="Parents" />
 
       <div className="space-y-10">
-        <ParentsTable />
+        <h2 className="text-lg font-semibold">Parents List</h2>
       </div>
     </>
   );
