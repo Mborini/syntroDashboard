@@ -1,6 +1,6 @@
 "use client";
 import { ConfirmModalProps } from "@/types/common";
-import { Modal, Text, Group } from "@mantine/core";
+import { Modal, Text, Group, Button } from "@mantine/core";
 import { AppButton } from "../ui-elements/button";
 import { BadgeCheck, OctagonAlertIcon, TriangleAlert } from "lucide-react";
 
@@ -33,10 +33,10 @@ export default function ConfirmModal({
     >
       <Text mb="md">{message}</Text>
       <Group>
-        <AppButton color="gray" onClick={onClose}>
+        <Button color="gray" onClick={onClose}>
           الغاء
-        </AppButton>
-        <AppButton
+        </Button>
+        <Button
           color={color}
           onClick={() => {
             onConfirm();
@@ -44,7 +44,7 @@ export default function ConfirmModal({
           }}
         >
           تأكيد الحذف
-        </AppButton>
+        </Button>
       </Group>
     </Modal>
   );
