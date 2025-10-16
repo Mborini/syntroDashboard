@@ -187,6 +187,14 @@ export const NAV_DATA: NavSection[] = [
 
             items: [],
           },
+          {
+            title: " الإجازات",
+            url: "/dashboard/HR/leaves",
+            icon: SlCalender,
+                        color:"#FB7185",
+
+            items: [],
+          },
         ],
       },
       {

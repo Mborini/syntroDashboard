@@ -10,10 +10,10 @@ import ConfirmModal from "../../Common/ConfirmModal";
 import { Toast } from "@/lib/toast";
 
 import { AttendanceDrawer } from "./Drawer";
-import { getAttendance, deleteAttendance } from "@/services/attendanceServices";
 import { Attendance } from "@/types/attendance";
 import { FaDoorOpen } from "react-icons/fa6";
 import { AttendanceFilter } from "./AttendanceFilter";
+import { deleteAttendance, getAttendance } from "@/services/attendanceServices";
 
 export function AttendanceTable() {
   const [records, setRecords] = useState<Attendance[]>([]);
@@ -83,7 +83,7 @@ export function AttendanceTable() {
       setModalOpened(false);
     } catch (error) {
       console.error(error);
-      Toast.error("فشل في حذف سجل الحضور");
+      Toast.error((error as any).message || "فشل في حذف سجل الحضور");
     }
   };
 
