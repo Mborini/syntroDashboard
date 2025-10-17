@@ -46,19 +46,6 @@ export const NAV_DATA: NavSection[] = [
     label: "MAIN MENU",
     items: [
       {
-        title: "Dashboard",
-        icon: Icons.HomeIcon,
-        color: "red",
-        items: [
-          {
-            title: "eCommerce",
-            url: "/dashboard/ecommerce",
-            items: [],
-          },
-        ],
-      },
-
-      {
         title: "الموردون",
         url: "/dashboard/suppliers",
         icon: FaShuttleVan,
@@ -212,100 +199,7 @@ export const NAV_DATA: NavSection[] = [
         icon: TfiUser ,
         items: [],
       },
-      {
-        title: "Calendar",
-        url: "/calendar",
-        icon: SlCalender  ,
-        items: [],
-      },
-      {
-        title: "Profile",
-        url: "/dashboard/profile",
-        icon: User2Icon,
-        items: [],
-      },
-      {
-        title: "Link Students",
-        url: "/dashboard/link",
-        icon: UnplugIcon,
-        items: [],
-      },
-      {
-        title: "Students",
-        url: "/dashboard/students",
-        icon: GraduationCap,
-        items: [],
-      },
-      {
-        title: "Forms",
-        icon: Icons.Alphabet,
-        items: [
-          {
-            title: "Form Elements",
-            url: "/dashboard/forms/form-elements",
-            items: [],
-          },
-          {
-            title: "Form Layout",
-            url: "/dashboard/forms/form-layout",
-            items: [],
-          },
-        ],
-      },
-      {
-        title: "Pages",
-        icon: Icons.Alphabet,
-        items: [
-          {
-            title: "Settings",
-            url: "/dashboard/pages/settings",
-            items: [],
-          },
-        ],
-      },
-    ],
-  },
-  {
-    label: "OTHERS",
-    items: [
-      {
-        title: "Charts",
-        icon: Icons.PieChart,
-        items: [
-          {
-            title: "Basic Chart",
-            url: "/dashboard/charts/basic-chart",
-            items: [],
-          },
-        ],
-      },
-      {
-        title: "UI Elements",
-        icon: Icons.FourCircle,
-        items: [
-          {
-            title: "Alerts",
-            url: "/dashboard/ui-elements/alerts",
-            items: [],
-          },
-          {
-            title: "Buttons",
-            url: "/dashboard/ui-elements/buttons",
-            items: [],
-          },
-        ],
-      },
-      {
-        title: "Authentication",
-        icon: Icons.Authentication,
-        items: [
-          {
-            title: "Sign In",
-            url: "/dashboard/auth/sign-in",
-            items: [],
-          },
-        ],
-      },
+      
     ],
   },
 ];
