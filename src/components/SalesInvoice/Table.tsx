@@ -10,7 +10,7 @@ import {
   Badge,
   Text,
 } from "@mantine/core";
-import { EyeIcon, PencilIcon, Plus, Trash2 } from "lucide-react";
+import { EyeIcon, PencilIcon, Plus, Printer, Trash2 } from "lucide-react";
 import ConfirmModal from "../Common/ConfirmModal";
 import { Toast } from "@/lib/toast";
 import { TableSkeleton } from "../Common/skeleton";
@@ -30,6 +30,8 @@ import {
   SalesInvoice,
   UpdateSalesInvoiceDTO,
 } from "@/types/salesInvoice";
+import { MdLocalPrintshop } from "react-icons/md";
+import handlePrintInvoice from "../Common/invoicePrintTemp";
 
 export function SalesInvoiceTable() {
   const [invoices, setInvoices] = useState<SalesInvoice[]>([]);
@@ -71,6 +73,7 @@ export function SalesInvoiceTable() {
   useEffect(() => {
     loadInvoices();
   }, []);
+
 
   const handleSubmit = async (
     data: CreateSalesInvoiceDTO | UpdateSalesInvoiceDTO,
@@ -328,39 +331,52 @@ export function SalesInvoiceTable() {
                     </Badge>
                   </Table.Td>
                   <Table.Td>
-                    <Group className="justify-center" gap="xs">
-                      <ActionIcon
-                        radius="xl"
-                        variant="light"
-                        color="blue"
-                        onClick={() => {
-                          setInvoiceDetails(inv);
-                          setDetailsOpened(true);
-                        }}
-                      >
-                        <EyeIcon size={18} />
-                      </ActionIcon>
-                      <ActionIcon
-                        radius="xl"
-                        variant="light"
-                        color="orange"
-                        onClick={() => {
-                          setSelectedInvoice(inv);
-                          setDrawerOpened(true);
-                        }}
-                      >
-                        <PencilIcon size={18} />
-                      </ActionIcon>
-                      <ActionIcon
-                        radius="xl"
-                        variant="light"
-                        color="red"
-                        onClick={() => handleDeleteClick(inv)}
-                      >
-                        <Trash2 size={18} />
-                      </ActionIcon>
-                    </Group>
-                  </Table.Td>
+  <Group className="justify-center" gap="xs">
+    <ActionIcon
+      radius="xl"
+      variant="light"
+      color="blue"
+      onClick={() => {
+        setInvoiceDetails(inv);
+        setDetailsOpened(true);
+      }}
+    >
+      <EyeIcon size={18} />
+    </ActionIcon>
+
+    <ActionIcon
+      radius="xl"
+      variant="light"
+      color="green"
+     onClick={() => handlePrintInvoice(inv)}
+    >
+      {/* أيقونة الطباعة */}
+      <MdLocalPrintshop />
+    </ActionIcon>
+
+    <ActionIcon
+      radius="xl"
+      variant="light"
+      color="orange"
+      onClick={() => {
+        setSelectedInvoice(inv);
+        setDrawerOpened(true);
+      }}
+    >
+      <PencilIcon size={18} />
+    </ActionIcon>
+
+    <ActionIcon
+      radius="xl"
+      variant="light"
+      color="red"
+      onClick={() => handleDeleteClick(inv)}
+    >
+      <Trash2 size={18} />
+    </ActionIcon>
+  </Group>
+</Table.Td>
+
                 </Table.Tr>
               );
             })}
