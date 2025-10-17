@@ -79,6 +79,8 @@ export function AttendanceDrawer({ opened, onClose, record, onSubmit }: Props) {
     >
       {!record && (
         <Select
+          variant="filled"
+          radius="md"
           label="الموظف"
           data={employees}
           value={form.employee_id?.toString() || ""}
@@ -89,6 +91,8 @@ export function AttendanceDrawer({ opened, onClose, record, onSubmit }: Props) {
       )}
 
       <TextInput
+        variant="filled"
+          radius="md"
         label="التاريخ"
         type="date"
         value={form.date}
@@ -99,6 +103,8 @@ export function AttendanceDrawer({ opened, onClose, record, onSubmit }: Props) {
       />
 
       <TextInput
+        variant="filled"
+          radius="md"
         label="وقت الدخول"
         type="time"
         value={form.check_in}
@@ -108,6 +114,8 @@ export function AttendanceDrawer({ opened, onClose, record, onSubmit }: Props) {
       />
 
       <TextInput
+        variant="filled"
+          radius="md"
         label="وقت الانصراف"
         type="time"
         value={form.check_out}

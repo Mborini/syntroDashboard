@@ -9,7 +9,7 @@ import {
   User2Icon,
   UserCog,
 } from "lucide-react";
-import { TbFileInvoice, TbInvoice, TbPackageImport, TbPackages } from "react-icons/tb";
+import { TbCashRegister, TbFileInvoice, TbInvoice, TbPackageImport, TbPackages } from "react-icons/tb";
 import { RiAlignItemBottomLine, RiAlignItemLeftFill } from "react-icons/ri";
 import { SiHomeassistantcommunitystore } from "react-icons/si";
 import { AiOutlineProduct } from "react-icons/ai";
@@ -25,6 +25,7 @@ import { LiaFileInvoiceDollarSolid } from "react-icons/lia";
 import { SlCalender } from "react-icons/sl";
 import { MdOutlineManageAccounts } from "react-icons/md";
 import { TfiUser } from "react-icons/tfi";
+import { FcLeave } from "react-icons/fc";
 
 export interface NavItem {
   title: string;
@@ -190,7 +191,15 @@ export const NAV_DATA: NavSection[] = [
           {
             title: " الإجازات",
             url: "/dashboard/HR/leaves",
-            icon: SlCalender,
+            icon: FcLeave ,
+                        color:"#FB7185",
+
+            items: [],
+          },
+          {
+            title: " المسحوبات",
+            url: "/dashboard/HR/withdrawals",
+            icon: TbCashRegister ,
                         color:"#FB7185",
 
             items: [],
