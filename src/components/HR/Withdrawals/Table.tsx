@@ -73,7 +73,7 @@ export function WithdrawalsTable() {
       setFilteredWithdrawals(refreshed);
       setDrawerOpened(false);
     } catch (error) {
-      Toast.error("فشل في حفظ قيمة السحب");
+  Toast.error(error instanceof Error ? error.message : "فشل في حفظ قيمة السحب");
       console.error(error);
     }
   };

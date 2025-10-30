@@ -1,4 +1,4 @@
-import { PaymentsOverview } from "@/components/Charts/payments-overview";
+import { TSPM } from "@/components/Charts/TSPM-overview";
 import { UsedDevices } from "@/components/Charts/used-devices";
 import { WeeksProfit } from "@/components/Charts/weeks-profit";
 import { createTimeFrameExtractor } from "@/utils/timeframe-extractor";
@@ -11,6 +11,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/authOptions";
 import { redirect } from "next/dist/client/components/redirect";
 import { UsersTable } from "@/components/Users/Table";
+import { TSIPM } from "@/components/Charts/TSIPM-overview";
 
 type PropsType = {
   searchParams: Promise<{
@@ -32,10 +33,19 @@ export default async function Home({ searchParams }: PropsType) {
       </Suspense>
 
       <div className="mt-4 grid grid-cols-12 gap-4 md:mt-6 md:gap-6 2xl:mt-9 2xl:gap-7.5">
-        <PaymentsOverview
+        <TSPM
           className="col-span-12 xl:col-span-7"
-          key={extractTimeFrame("payments_overview")}
-          timeFrame={extractTimeFrame("payments_overview")?.split(":")[1]}
+         
+          
+        />   <WeeksProfit
+          key={extractTimeFrame("weeks_profit")}
+          timeFrame={extractTimeFrame("weeks_profit")?.split(":")[1]}
+          className="col-span-12 xl:col-span-5"
+        />
+        <TSIPM
+          className="col-span-12 xl:col-span-7"
+         
+          
         />
 
         <WeeksProfit

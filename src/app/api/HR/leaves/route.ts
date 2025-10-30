@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import pool from "@/lib/db";
+import { updateEmployeeMonthlySummary } from "../updateEmployeeSummary/route";
 
 export async function GET() {
   const client = await pool.connect();
@@ -57,6 +58,8 @@ export async function POST(req: NextRequest) {
        RETURNING *`,
       [employee_id, date, reason]
     );
+const leaveDate = new Date(date); // تحويل التاريخ إلى كائن Date
+await updateEmployeeMonthlySummary(employee_id, leaveDate);
 
     return NextResponse.json(res.rows[0], { status: 201 });
   } catch (error) {

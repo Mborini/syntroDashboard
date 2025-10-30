@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import pool from "@/lib/db";
+import { updateEmployeeMonthlySummary } from "../updateEmployeeSummary/route";
 
 export async function GET() {
   const client = await pool.connect();
@@ -44,7 +45,8 @@ export async function POST(req: NextRequest) {
        VALUES ($1, $2, $3)
        RETURNING *`,
       [employee_id, date, check_in || null]
-    );
+    );await updateEmployeeMonthlySummary(employee_id, date);
+
     return NextResponse.json(res.rows[0]);
   } catch (error: any) {
     console.error(error);

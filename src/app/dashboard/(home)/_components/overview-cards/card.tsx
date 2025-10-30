@@ -1,53 +1,55 @@
-import { ArrowDownIcon, ArrowUpIcon } from "@/assets/icons";
-import { cn } from "@/lib/utils";
-import type { JSX, SVGProps } from "react";
+"use client";
 
-type PropsType = {
-  label: string;
-  data: {
-    value: number | string;
-    growthRate: number;
-  };
-  Icon: (props: SVGProps<SVGSVGElement>) => JSX.Element;
+import React from "react";
+import { Card, Text } from "@mantine/core";
+import { motion } from "framer-motion";
+import type { LucideIcon } from "lucide-react";
+
+type ShortCardProps = {
+  title: string;
+  value: number;
+  Icon: LucideIcon;
+  color?: string;
 };
 
-export function OverviewCard({ label, data, Icon }: PropsType) {
-  const isDecreasing = data.growthRate < 0;
-
+export function ShortCard({ title, value, Icon, color = "blue" }: ShortCardProps) {
   return (
-    <div className="rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark">
-      <Icon />
+    <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
+      <Card
+        shadow="sm"
+        radius="xl"
+        padding="lg"
+        className={`flex flex-col items-center justify-center gap-3 bg-${color}-50 border border-${color}-200 hover:shadow-lg transition-all duration-200`}
+      >
+        <div className={`p-3 rounded-full bg-${color}-100  text-${color}-600`}>
+          <Icon size={28} />
+        </div>
 
-      <div className="mt-6 flex items-end justify-between">
-        <dl>
-          <dt className="mb-1.5 text-heading-6 font-bold text-dark dark:text-white">
-            {data.value}
-          </dt>
+        <Text size="lg" fw={600} className="text-gray-700 text-center">
+          {title}
+        </Text>
 
-          <dd className="text-sm font-medium text-dark-6">{label}</dd>
-        </dl>
+        <Text size="xl" fw={700} className={`text-${color}-700`}>
+          {value.toLocaleString()}{" "}
+          <span className="text-sm text-gray-500">JOD</span>
+        </Text>
+      </Card>
+    </motion.div>
+  );
+}
 
-        <dl
-          className={cn(
-            "text-sm font-medium",
-            isDecreasing ? "text-red" : "text-green",
-          )}
-        >
-          <dt className="flex items-center gap-1.5">
-            {data.growthRate}%
-            {isDecreasing ? (
-              <ArrowDownIcon aria-hidden />
-            ) : (
-              <ArrowUpIcon aria-hidden />
-            )}
-          </dt>
-
-          <dd className="sr-only">
-            {label} {isDecreasing ? "Decreased" : "Increased"} by{" "}
-            {data.growthRate}%
-          </dd>
-        </dl>
-      </div>
-    </div>
+// 🎨 Skeleton أثناء التحميل
+export function ShortCardSkeleton() {
+  return (
+    <Card
+      shadow="sm"
+      radius="xl"
+      padding="lg"
+      className="flex flex-col items-center justify-center gap-3 bg-gray-100 animate-pulse h-[160px]"
+    >
+      <div className="p-3 rounded-full bg-gray-300 w-12 h-12" />
+      <div className="h-4 w-24 bg-gray-300 rounded" />
+      <div className="h-5 w-20 bg-gray-300 rounded" />
+    </Card>
   );
 }

@@ -379,13 +379,15 @@ const handleSave = async () => {
             readOnly
           />
           <TextInput
-            variant="filled"
-            label="المبلغ المدفوع"
-            value={paidAmount}
-            min={0}
-            max={grandTotal}
-            onChange={(val) => setPaidAmount(Number(val) || 0)}
-          />
+  variant="filled"
+  label="المبلغ المدفوع"
+  type="number"
+  value={paidAmount}
+  min={0}
+  max={grandTotal}
+  onChange={(e) => setPaidAmount(Number(e.currentTarget.value) || 0)}
+/>
+
           <div className="flex gap-2">
             <TextInput
               variant="filled"

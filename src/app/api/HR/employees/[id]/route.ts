@@ -1,5 +1,6 @@
 import pool from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
+import { updateEmployeeMonthlySummary } from "../../updateEmployeeSummary/route";
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
   try {
@@ -16,6 +17,8 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     );
 
     client.release();
+    await updateEmployeeMonthlySummary(res.rows[0].id, res.rows[0].start_date);
+
     return NextResponse.json(res.rows[0]);
   } catch (error) {
     console.error(error);

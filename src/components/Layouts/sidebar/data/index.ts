@@ -9,7 +9,7 @@ import {
   User2Icon,
   UserCog,
 } from "lucide-react";
-import { TbCashRegister, TbFileInvoice, TbInvoice, TbPackageImport, TbPackages } from "react-icons/tb";
+import { TbCashRegister, TbFileInvoice, TbInvoice, TbPackageImport, TbPackages, TbReportAnalytics } from "react-icons/tb";
 import { RiAlignItemBottomLine, RiAlignItemLeftFill } from "react-icons/ri";
 import { SiHomeassistantcommunitystore } from "react-icons/si";
 import { AiOutlineProduct } from "react-icons/ai";
@@ -26,6 +26,7 @@ import { SlCalender } from "react-icons/sl";
 import { MdOutlineManageAccounts } from "react-icons/md";
 import { TfiUser } from "react-icons/tfi";
 import { FcLeave } from "react-icons/fc";
+import { FaClipboardUser } from "react-icons/fa6";
 
 export interface NavItem {
   title: string;
@@ -115,6 +116,23 @@ export const NAV_DATA: NavSection[] = [
         ],
       },
       {
+        title: "التقارير",
+        icon: TbReportAnalytics ,
+        color: "#A41B3C",
+
+        items: [
+          {
+            title: "تقرير الموظفين",
+            url: "/dashboard/reports/employees",
+            icon: FaClipboardUser ,
+            color: "#A41B31",
+
+            items: [],
+          },
+          
+        ],
+      },
+      {
         title: "المستودعات",
         color: "#8B5CF6",
 
@@ -186,6 +204,14 @@ export const NAV_DATA: NavSection[] = [
           {
             title: " المسحوبات",
             url: "/dashboard/HR/withdrawals",
+            icon: TbCashRegister ,
+                        color:"#FB7185",
+
+            items: [],
+          },
+          {
+            title: " دفع الرواتب",
+            url: "/dashboard/HR/payrolls",
             icon: TbCashRegister ,
                         color:"#FB7185",
 
