@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
     );
 
     client.release();
-    await updateEmployeeMonthlySummary(res.rows[0].id, start_date);
+await updateEmployeeMonthlySummary(res.rows[0].id, start_date, end_date);
     return NextResponse.json(res.rows[0], { status: 201 });
   } catch (error) {
     console.error(error);

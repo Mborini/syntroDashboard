@@ -211,7 +211,7 @@ export const NAV_DATA: NavSection[] = [
           },
           {
             title: " دفع الرواتب",
-            url: "/dashboard/HR/payrolls",
+            url: "/dashboard/HR/payroll",
             icon: TbCashRegister ,
                         color:"#FB7185",
 

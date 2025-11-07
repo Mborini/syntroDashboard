@@ -26,29 +26,34 @@ export function EmployeeDrawer({
     is_active: true,
   });
 
-  useEffect(() => {
-    if (employee) {
-      setForm({
-        name: employee.name,
-        phone: employee.phone,
-        address: employee.address,
-        start_date: employee.start_date,
-        end_date: employee.end_date,
-        salary: employee.salary,
-        is_active: employee.is_active,
-      });
-    } else {
-      setForm({
-        name: "",
-        phone: "",
-        address: "",
-        start_date: "",
-        end_date: "",
-        salary: 0,
-        is_active: true,
-      });
-    }
-  }, [employee, opened]);
+ useEffect(() => {
+  if (employee) {
+    setForm({
+      name: employee.name,
+      phone: employee.phone,
+      address: employee.address,
+      start_date: employee.start_date
+        ? employee.start_date.split("T")[0]
+        : "",
+      end_date: employee.end_date
+        ? employee.end_date.split("T")[0]
+        : "",
+      salary: employee.salary,
+      is_active: employee.is_active,
+    });
+  } else {
+    setForm({
+      name: "",
+      phone: "",
+      address: "",
+      start_date: "",
+      end_date: "",
+      salary: 0,
+      is_active: true,
+    });
+  }
+}, [employee, opened]);
+
 
   const handleSubmit = () => {
     if (!form.name || !form.phone || !form.start_date) {

@@ -17,7 +17,8 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     );
 
     client.release();
-    await updateEmployeeMonthlySummary(res.rows[0].id, res.rows[0].start_date);
+    await updateEmployeeMonthlySummary(res.rows[0].id, start_date, end_date);
+
 
     return NextResponse.json(res.rows[0]);
   } catch (error) {

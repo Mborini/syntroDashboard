@@ -15,12 +15,20 @@ export async function GET() {
         s.missing_hours,
         s.total_leaves,
         s.total_withdrawals,
-        s.remaining_salary
+        s.remaining_salary,
+        CASE 
+          WHEN p.id IS NOT NULL THEN TRUE 
+          ELSE FALSE 
+        END AS is_paid
       FROM employee_monthly_summary s
       JOIN employees e ON e.id = s.employee_id
+      LEFT JOIN payroll p 
+        ON s.employee_id = p.employee_id 
+        AND s.month = p.month
       ORDER BY s.month DESC;
     `);
     client.release();
+    console.log(res.rows);
     return NextResponse.json(res.rows);
   } catch (error) {
     console.error("Error fetching employee summary:", error);

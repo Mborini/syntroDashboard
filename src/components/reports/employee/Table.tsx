@@ -7,6 +7,8 @@ import { TableSkeleton } from "../../Common/skeleton";
 import { getEmployeesSammaryReport } from "@/services/employeesSammaryReport";
 import { EmployeeReportFilter } from "./EmployeeReportFilter";
 import { EmployeeReportActions } from "./EmployeeReportActions";
+import { CiCircleCheck } from "react-icons/ci";
+import { VscError } from "react-icons/vsc";
 
 type EmployeeSummary = {
   employee_name: string;
@@ -18,6 +20,7 @@ type EmployeeSummary = {
   total_leaves: number;
   total_withdrawals: number;
   remaining_salary: number;
+  is_paid: boolean;
 };
 
 export function EmployeeReportTable() {
@@ -83,6 +86,7 @@ export function EmployeeReportTable() {
               <Table.Th style={{ textAlign: "center" }}>الإجازات</Table.Th>
               <Table.Th style={{ textAlign: "center" }}>السحوبات</Table.Th>
               <Table.Th style={{ textAlign: "center" }}>الراتب المتبقي</Table.Th>
+              <Table.Th style={{ textAlign: "center" }}>حالة الدفع</Table.Th>
             </Table.Tr>
           </Table.Thead>
 
@@ -98,6 +102,24 @@ export function EmployeeReportTable() {
                 <Table.Td>{item.total_leaves}</Table.Td>
                 <Table.Td>{item.total_withdrawals}</Table.Td>
                 <Table.Td>{item.remaining_salary}</Table.Td>
+                <Table.Td>
+  <div className="flex items-center justify-center gap-1">
+    {item.is_paid ? (
+      <>
+        <CiCircleCheck size={18} color="green" />
+        <Text c={"green"}>مدفوع</Text>
+      </>
+    ) : (
+      <>
+        <VscError size={18} color="red" />
+        <Text c={"red"}>غير مدفوع</Text>
+      </>
+    )}
+  </div>
+</Table.Td>
+
+
+                    
               </Table.Tr>
             ))}
           </Table.Tbody>
