@@ -16,7 +16,6 @@ export async function GET() {
       ORDER BY s.id DESC
     `);
 
-    console.log("Fetched sales items with warehouse quantity:", result.rows);
     return NextResponse.json(result.rows);
 
   } catch (error) {

@@ -21,7 +21,6 @@ export async function GET() {
     `);
 
     client.release();
-
     return NextResponse.json(res.rows);
   } catch (error) {
     console.error("❌ GET Inventory Error:", error);
