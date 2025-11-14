@@ -1,6 +1,6 @@
 import pool from "@/lib/db";
+import { updateEmployeeMonthlySummary } from "@/lib/hrSummary";
 import { NextRequest, NextResponse } from "next/server";
-import { updateEmployeeMonthlySummary } from "../updateEmployeeSummary/route";
 export async function GET() {
   try {
     const client = await pool.connect();
