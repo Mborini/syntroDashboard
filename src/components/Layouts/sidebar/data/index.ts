@@ -4,6 +4,7 @@ import {
   DoorClosed,
   GitBranchIcon,
   GraduationCap,
+  NotepadText,
   ShieldUser,
   UnplugIcon,
   User2Icon,
@@ -125,6 +126,14 @@ export const NAV_DATA: NavSection[] = [
             title: "تقرير الموظفين",
             url: "/dashboard/reports/employees",
             icon: FaClipboardUser ,
+            color: "#A41B31",
+
+            items: [],
+          },
+          {
+            title: "التقرير المالي",
+            url: "/dashboard/reports/monthly",
+            icon: NotepadText ,
             color: "#A41B31",
 
             items: [],

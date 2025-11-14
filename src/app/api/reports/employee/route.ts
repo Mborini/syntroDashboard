@@ -28,13 +28,12 @@ export async function GET() {
       ORDER BY s.month DESC;
     `);
     client.release();
-    console.log(res.rows);
     return NextResponse.json(res.rows);
   } catch (error) {
     console.error("Error fetching employee summary:", error);
     return NextResponse.json(
       { error: (error as Error).message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

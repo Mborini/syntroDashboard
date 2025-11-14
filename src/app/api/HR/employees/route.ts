@@ -1,13 +1,12 @@
 import pool from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import { updateEmployeeMonthlySummary } from "../updateEmployeeSummary/route";
-
 export async function GET() {
   try {
     const client = await pool.connect();
 
-    const res = await client.query(
-      `SELECT 
+    const res = await client.query(`
+      SELECT 
         id,
         name,
         phone,
@@ -15,11 +14,12 @@ export async function GET() {
         start_date,
         end_date,
         salary,
-        is_active
-       FROM employees
-       ORDER BY id ASC;
-      `,
-    );
+        is_active,
+        is_deleted
+      FROM employees
+      WHERE is_deleted = FALSE
+      ORDER BY id ASC;
+    `);
 
     client.release();
     return NextResponse.json(res.rows);
@@ -31,6 +31,7 @@ export async function GET() {
     );
   }
 }
+
 
 export async function POST(req: NextRequest) {
   try {

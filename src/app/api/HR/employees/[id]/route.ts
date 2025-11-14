@@ -29,13 +29,18 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     );
   }
 }
-
 export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
   try {
     const client = await pool.connect();
-    await client.query(`DELETE FROM employees WHERE id=$1`, [params.id]);
+
+    // تحديث بدلاً من الحذف الحقيقي
+    await client.query(
+      `UPDATE employees SET is_deleted = TRUE WHERE id = $1`,
+      [params.id]
+    );
+
     client.release();
-    return NextResponse.json({ message: "Employee deleted successfully" });
+    return NextResponse.json({ message: "تم حذف الموظف (حذف منطقي)" });
   } catch (error) {
     console.error(error);
     return NextResponse.json(
@@ -44,6 +49,7 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
     );
   }
 }
+
 
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   try {
