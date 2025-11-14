@@ -1,10 +1,11 @@
+// src/app/api/HR/updateEmployeeSummary/route.ts
+import { NextRequest, NextResponse } from "next/server";
 import pool from "@/lib/db";
 
 /**
- * إنشاء أو تحديث ملخص شهري لكل الأشهر بين start_date و end_date
- * وحذف الأشهر التي أصبحت خارج الفترة
+ * دالة لحساب وتحديث الملخص الشهري للموظف
  */
-export async function updateEmployeeMonthlySummary(
+async function updateEmployeeMonthlySummary(
   employee_id: number,
   start_date: string | Date,
   end_date?: string | Date
@@ -12,18 +13,17 @@ export async function updateEmployeeMonthlySummary(
   const client = await pool.connect();
   try {
     const start = new Date(start_date);
-    const end = end_date ? new Date(end_date) : new Date(); // لو ما في end_date خذ اليوم
+    const end = end_date ? new Date(end_date) : new Date();
 
-    // نحسب كل الأشهر ضمن الفترة
+    // إنشاء قائمة الأشهر بين start و end
     const months: string[] = [];
     const current = new Date(start);
     while (current <= end) {
-      const monthStr = current.toISOString().slice(0, 7); // YYYY-MM
-      months.push(monthStr);
+      months.push(current.toISOString().slice(0, 7)); // YYYY-MM
       current.setMonth(current.getMonth() + 1);
     }
 
-    // 🧹 نحذف الأشهر اللي مش ضمن الفترة
+    // حذف الأشهر التي لم تعد ضمن الفترة
     await client.query(
       `DELETE FROM employee_monthly_summary 
        WHERE employee_id = $1 
@@ -31,14 +31,14 @@ export async function updateEmployeeMonthlySummary(
       [employee_id, ...months]
     );
 
-    // نجيب الراتب الأساسي
+    // جلب الراتب الأساسي
     const empRes = await client.query(
       `SELECT salary FROM employees WHERE id = $1`,
       [employee_id]
     );
     const base_salary = Number(empRes.rows[0]?.salary || 0);
 
-    // نمر على كل شهر ونحسب البيانات
+    // المرور على كل شهر
     for (const month of months) {
       // مجموع السحوبات
       const withdrawalsRes = await client.query(
@@ -67,8 +67,7 @@ export async function updateEmployeeMonthlySummary(
       // حساب الأيام في الشهر
       const [year, monthNum] = month.split("-").map(Number);
       const daysInMonth = new Date(year, monthNum, 0).getDate();
-      const workDays = daysInMonth;
-      const official_monthly_hours = workDays * 9;
+      const official_monthly_hours = daysInMonth * 9; // 9 ساعات يومية
       const hourly_rate = base_salary / official_monthly_hours;
 
       // الإجازات
@@ -79,7 +78,6 @@ export async function updateEmployeeMonthlySummary(
         [employee_id, month]
       );
       const leave_count = Number(leavesRes.rows[0].leave_count || 0);
-
       const unpaid_leave_days = leave_count > 2 ? leave_count - 2 : 0;
       const leave_deduction =
         Math.round((unpaid_leave_days * 9 * hourly_rate + Number.EPSILON) * 100) / 100;
@@ -91,12 +89,7 @@ export async function updateEmployeeMonthlySummary(
         Math.round((overtime_hours * 1.5 + Number.EPSILON) * 100) / 100;
 
       const remaining_salary = Math.round(
-        (base_salary -
-          missing_deduction -
-          leave_deduction +
-          overtime_bonus -
-          total_withdrawals +
-          Number.EPSILON) * 100
+        (base_salary - missing_deduction - leave_deduction + overtime_bonus - total_withdrawals + Number.EPSILON) * 100
       ) / 100;
 
       // إدخال أو تحديث السطر في employee_monthly_summary
@@ -132,7 +125,31 @@ export async function updateEmployeeMonthlySummary(
     }
   } catch (error) {
     console.error("❌ updateEmployeeMonthlySummary Error:", error);
+    throw error;
   } finally {
     client.release();
+  }
+}
+
+/**
+ * دالة POST لاستدعاء API
+ */
+export async function POST(req: NextRequest) {
+  try {
+    const { employee_id, start_date, end_date } = await req.json();
+
+    if (!employee_id || !start_date) {
+      return NextResponse.json(
+        { error: "employee_id و start_date مطلوبين" },
+        { status: 400 }
+      );
+    }
+
+    await updateEmployeeMonthlySummary(employee_id, start_date, end_date);
+
+    return NextResponse.json({ message: "تم التحديث بنجاح" });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: "حدث خطأ أثناء التحديث" }, { status: 500 });
   }
 }
