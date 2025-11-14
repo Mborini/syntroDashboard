@@ -5,7 +5,7 @@ import pool from "@/lib/db";
 /**
  * دالة لحساب وتحديث الملخص الشهري للموظف
  */
-async function updateEmployeeMonthlySummary(
+export async function updateEmployeeMonthlySummary(
   employee_id: number,
   start_date: string | Date,
   end_date?: string | Date
