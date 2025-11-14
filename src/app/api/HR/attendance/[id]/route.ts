@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import pool from "@/lib/db";
-import { updateEmployeeMonthlySummary } from "../../updateEmployeeSummary/route";
+import { updateEmployeeMonthlySummary } from "@/lib/hrSummary";
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
   const attendanceId = Number(params.id);
