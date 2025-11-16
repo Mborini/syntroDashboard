@@ -5,10 +5,13 @@ import {
 } from "@/types/inventory";
 
 export async function getInventoryItems(): Promise<InventoryItem[]> {
-  const res = await fetch("/api/inventory");
+  const res = await fetch("/api/inventory", {
+    cache: "no-store",
+  });
   if (!res.ok) throw new Error("فشل جلب بيانات المستودع");
   return res.json();
 }
+
 
 // إذا أردت إضافة/تعديل أصناف يدويًا في المستقبل
 export async function createInventoryItem(
