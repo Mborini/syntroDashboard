@@ -9,12 +9,10 @@ type Props = {
 };
 
 export function WarehouseFilter({ onFilter }: Props) {
-  const today = new Date(); // لحساب تاريخ اليوم
-
   const [name, setName] = useState("");
   const [weight, setWeight] = useState("");
   const [quantity, setQuantity] = useState("");
-  const [date, setDate] = useState<Date | null>(today); // ⭐ افتراضي اليوم
+  const [date, setDate] = useState<Date | null>(null); // ❌ لا تاريخ افتراضي
 
   useEffect(() => {
     const timeout = setTimeout(

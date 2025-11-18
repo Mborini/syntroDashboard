@@ -4,10 +4,12 @@ export type InvoiceItem = {
   name: string;      // اسم الصنف
   qty: number;       // الكمية
   price: number;     // السعر للوحدة
+  
 };
 
 // إنشاء فاتورة جديدة
 export type CreateExpensesInvoiceDTO = {
+  expense_type_id: number; // معرف نوع المصروف
   invoice_no: string;       // رقم الفاتورة
   supplier_id?: number;     // معرف المورد (اختياري لو عندك جدول موردين)
   supplier?: string;   // اسم المورد (لو ما عندك جدول منفصل)
@@ -26,6 +28,8 @@ export type UpdateExpensesInvoiceDTO = Partial<CreateExpensesInvoiceDTO>;
 // الفاتورة كاملة زي ما بترجع من الـ API أو DB
 export type ExpensesInvoice = {
   remaining_amount: number;
+  expense_type_id: number;
+  expense_type?: string;
   paid_amount: number;
   id: number;                // رقم داخلي من قاعدة البيانات
   invoice_no: string;

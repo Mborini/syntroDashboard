@@ -20,6 +20,7 @@ import {
 } from "@/types/ExpensesInvoice";
 import { getSuppliers } from "@/services/supplierServices";
 import { Toast } from "@/lib/toast";
+import { getExpenseTypes } from "@/services/expensesTypeServices";
 
 type Props = {
   opened: boolean;
@@ -45,14 +46,14 @@ export function ExpensesInvoiceDrawer({
   const [isSaving, setIsSaving] = useState(false);
   const grandTotal = items.reduce((sum, i) => sum + i.qty * i.price, 0);
   const remainingAmount = Math.max(grandTotal - paidAmount, 0);
-  const [suppliers, setSuppliers] = useState<{ id: number; name: string }[]>(
-    [],
-  );
+const [expenseTypeId, setExpenseTypeId] = useState(0);
+const [expenseTypes, setExpenseTypes] = useState<{ id: number; name: string }[]>([]);
 
   useEffect(() => {
     if (invoice) {
       setInvoiceNo(invoice.invoice_no);
       setSupplierId(invoice.supplier_id || 0);
+      setExpenseTypeId(invoice.expense_type_id || 0);
       setInvoiceDate(invoice.invoice_date || "");
       setItems(invoice.items || []);
       setPaidAmount(invoice.paid_amount || 0);
@@ -65,16 +66,17 @@ export function ExpensesInvoiceDrawer({
     }
   }, [invoice, opened]);
   useEffect(() => {
-    async function loadSuppliers() {
-      try {
-        const data = await getSuppliers();
-        setSuppliers(data);
-      } catch (error) {
-        console.error("Failed to fetch suppliers:", error);
-      }
+  async function loadExpenseTypes() {
+    try {
+      const data = await getExpenseTypes(); // تجلب أنواع المصاريف
+      setExpenseTypes(data);
+    } catch (error) {
+      console.error("Failed to fetch expense types:", error);
     }
-    loadSuppliers();
-  }, []);
+  }
+  loadExpenseTypes();
+}, []);
+
   // تحديث الحالة تلقائيًا
   useEffect(() => {
     if (paidAmount === 0) setStatus("ذمم");
@@ -124,7 +126,7 @@ export function ExpensesInvoiceDrawer({
 
       const data: CreateExpensesInvoiceDTO | UpdateExpensesInvoiceDTO = {
         invoice_no: invoiceNo,
-        supplier_id: supplierId,
+        expense_type_id: expenseTypeId,
         invoice_date: invoiceDate,
         items: roundedItems,
         grand_total: roundedGrandTotal,
@@ -144,7 +146,7 @@ export function ExpensesInvoiceDrawer({
 
   const isValid =
     invoiceNo.trim() !== "" &&
-    supplierId > 0 &&
+    expenseTypeId > 0 &&
     items.length > 0 &&
     items.every((it) => it.name.trim() !== "" && it.qty > 0 && it.price > 0) &&
     paidAmount >= 0 &&
@@ -174,16 +176,17 @@ export function ExpensesInvoiceDrawer({
             onChange={(e) => setInvoiceDate(e.currentTarget.value)}
           />
           <Select
-            variant="filled"
-            label="المورد"
-            placeholder="اختر المورد"
-            value={supplierId ? String(supplierId) : ""}
-            onChange={(val) => setSupplierId(val ? Number(val) : 0)}
-            data={suppliers.map((s) => ({
-              value: String(s.id),
-              label: s.name,
-            }))}
-          />
+  variant="filled"
+  label="نوع المصاريف"
+  placeholder="اختر النوع"
+  value={expenseTypeId ? String(expenseTypeId) : ""}
+  onChange={(val) => setExpenseTypeId(val ? Number(val) : 0)}
+  data={expenseTypes.map((t) => ({
+    value: String(t.id),
+    label: t.name,
+  }))}
+/>
+         
         </div>
         <Divider />
         <div dir="rtl" className="grid grid-cols-4 text-center font-bold">
@@ -274,7 +277,7 @@ export function ExpensesInvoiceDrawer({
         </div>
 
         <Button
-          variant={invoice ? "outline" : "light"}
+          variant={"light"}
           color={invoice ? "orange" : "green"}
           fullWidth
           disabled={!isValid||isSaving }

@@ -8,12 +8,12 @@ export async function GET() {
 
     // نجيب الفواتير مع الأصناف
     const invoicesRes = await client.query(
-      ` SELECT pi.*, s.name AS supplier
+      ` SELECT pi.*, s.name AS expense_type
   FROM expenses_invoices pi
-  LEFT JOIN suppliers s ON pi.supplier_id = s.id
+  LEFT JOIN expenses_types s ON pi.expense_type_id = s.id
   ORDER BY pi.id ASC`
     );
-
+console.log(invoicesRes.rows);
     const itemsRes = await client.query(
       `SELECT * FROM expenses_invoice_items ORDER BY id ASC;`
     );
@@ -39,7 +39,7 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { invoice_no, supplier_id, invoice_date, items, grand_total, status, paid_amount, remaining_amount } = body;
+const { invoice_no, expense_type_id, invoice_date, items, grand_total, status, paid_amount, remaining_amount } = body;
 
     const client = await pool.connect();
     try {
@@ -48,9 +48,9 @@ export async function POST(req: Request) {
       // إدخال الفاتورة مع الحقول الجديدة
       const invoiceRes = await client.query(
         `INSERT INTO expenses_invoices 
-          (invoice_no, supplier_id, invoice_date, grand_total, status, paid_amount, remaining_amount) 
+          (invoice_no, expense_type_id, invoice_date, grand_total, status, paid_amount, remaining_amount) 
          VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-        [invoice_no, supplier_id, invoice_date || new Date(), grand_total, status, paid_amount, remaining_amount]
+        [invoice_no, expense_type_id, invoice_date || new Date(), grand_total, status, paid_amount, remaining_amount]
       );
 
       const invoice = invoiceRes.rows[0];

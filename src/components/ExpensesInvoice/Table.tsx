@@ -80,17 +80,17 @@ export function ExpensesInvoiceTable() {
           selectedInvoice.id,
           data as UpdateExpensesInvoiceDTO,
         );
-        Toast.success("Invoice updated successfully");
+        Toast.success("تم تحديث الفاتورة بنجاح");
       } else {
         await createExpensesInvoice(data as CreateExpensesInvoiceDTO);
-        Toast.success("Invoice created successfully");
+        Toast.success("تم إنشاء الفاتورة بنجاح");
       }
       await loadInvoices();
       setDrawerOpened(false);
       setSelectedInvoice(null);
     } catch (error) {
       console.error(error);
-      Toast.error("Failed to save invoice");
+      Toast.error("حدث خطأ أثناء حفظ الفاتورة");
     }
   };
 
@@ -108,10 +108,10 @@ export function ExpensesInvoiceTable() {
         prev.filter((c) => c.id !== invoiceToDelete.id),
       );
       setModalOpened(false);
-      Toast.success("Invoice deleted successfully");
+      Toast.success("تم حذف الفاتورة بنجاح");
     } catch (error) {
       console.error(error);
-      Toast.error("Failed to delete invoice");
+      Toast.error("فشل حذف الفاتورة");
     }
   };
 
@@ -308,7 +308,7 @@ export function ExpensesInvoiceTable() {
                   className="h-12 cursor-pointer hover:bg-gray-100"
                 >
                   <Table.Td>{inv.invoice_no}</Table.Td>
-                  <Table.Td>{inv.supplier || "-"}</Table.Td>
+                  <Table.Td>{inv.expense_type || "-"}</Table.Td>
                   <Table.Td>
                     {new Date(inv.invoice_date).toLocaleDateString()}
                   </Table.Td>
@@ -419,8 +419,8 @@ export function ExpensesInvoiceTable() {
         opened={modalOpened}
         onClose={() => setModalOpened(false)}
         onConfirm={handleConfirmDelete}
-        title="Delete Invoice"
-        message="Are you sure you want to delete this invoice?"
+        title="حذف الفاتورة"
+        message="هل أنت متأكد أنك تريد حذف هذه الفاتورة؟"
         color="red"
       />
     </>

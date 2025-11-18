@@ -10,14 +10,28 @@ import {
   User2Icon,
   UserCog,
 } from "lucide-react";
-import { TbCashRegister, TbFileInvoice, TbInvoice, TbPackageImport, TbPackages, TbReportAnalytics } from "react-icons/tb";
+import {
+  TbCashRegister,
+  TbFileInvoice,
+  TbInvoice,
+  TbPackageImport,
+  TbPackages,
+  TbReportAnalytics,
+} from "react-icons/tb";
 import { RiAlignItemBottomLine, RiAlignItemLeftFill } from "react-icons/ri";
 import { SiHomeassistantcommunitystore } from "react-icons/si";
 import { AiOutlineProduct } from "react-icons/ai";
 import { IoMdMan } from "react-icons/io";
-import { FaBoxesStacked, FaFileInvoice, FaFileInvoiceDollar, FaTruckRampBox, FaUsersBetweenLines, FaUsersGear } from "react-icons/fa6";
+import {
+  FaBoxesStacked,
+  FaFileInvoice,
+  FaFileInvoiceDollar,
+  FaTruckRampBox,
+  FaUsersBetweenLines,
+  FaUsersGear,
+} from "react-icons/fa6";
 import { PiEyeDuotone, PiInvoiceBold, PiInvoiceDuotone } from "react-icons/pi";
-import { FaShuttleVan } from "react-icons/fa";
+import { FaHome, FaShuttleVan } from "react-icons/fa";
 import { HiOutlineUsers, HiUserGroup } from "react-icons/hi2";
 import { BiSolidCalendarHeart, BiSolidPackage } from "react-icons/bi";
 import { TbPackageExport } from "react-icons/tb";
@@ -46,33 +60,25 @@ export interface NavSection {
 export const NAV_DATA: NavSection[] = [
   {
     label: "MAIN MENU",
-    items: [
-      {
-        title: "الموردون",
-        url: "/dashboard/suppliers",
-        icon: FaShuttleVan,
-        color: "#10B981",
-        items: [],
-      },
-      {
-        title: "العملاء",
-        url: "/dashboard/customers",
-        icon: HiOutlineUsers,
-        color: "#6366F1",
-        items: [],
-      },
+    items: [ {
+            title: "الصفحة الرئيسية",
+            url: "/dashboard",
+            icon: FaHome,
+            color: "#FDBA74",
 
+            items: [],
+          },
       {
         title: "الفواتير",
         color: "#1C3FB7",
 
-        icon: PiInvoiceDuotone ,
+        icon: PiInvoiceDuotone,
         items: [
           {
             title: "مشتريات",
             color: "#3C50E0",
             url: "/dashboard/invoices/purchases",
-            icon: TbInvoice  ,
+            icon: TbInvoice,
             items: [],
           },
           {
@@ -80,7 +86,7 @@ export const NAV_DATA: NavSection[] = [
             color: "#3C50E0",
 
             url: "/dashboard/invoices/expenses",
-            icon: LiaFileInvoiceDollarSolid ,
+            icon: LiaFileInvoiceDollarSolid,
             items: [],
           },
           {
@@ -118,14 +124,14 @@ export const NAV_DATA: NavSection[] = [
       },
       {
         title: "التقارير",
-        icon: TbReportAnalytics ,
+        icon: TbReportAnalytics,
         color: "#A41B3C",
 
         items: [
           {
             title: "تقرير الموظفين",
             url: "/dashboard/reports/employees",
-            icon: FaClipboardUser ,
+            icon: FaClipboardUser,
             color: "#A41B31",
 
             items: [],
@@ -133,12 +139,40 @@ export const NAV_DATA: NavSection[] = [
           {
             title: "التقرير المالي",
             url: "/dashboard/reports/monthly",
-            icon: NotepadText ,
+            icon: NotepadText,
             color: "#A41B31",
 
             items: [],
           },
-          
+        ],
+      },
+      {
+        title: "رموز النظام",
+        icon: TbReportAnalytics,
+        color: "#A41B3C",
+
+        items: [
+          {
+            title: "الموردون",
+            url: "/dashboard/suppliers",
+            icon: FaShuttleVan,
+            color: "#10B981",
+            items: [],
+          },
+          {
+            title: "أنواع المصاريف",
+            url: "/dashboard/expensesTypes",
+            icon: FaShuttleVan,
+            color: "#10B981",
+            items: [],
+          },
+          {
+            title: "العملاء",
+            url: "/dashboard/customers",
+            icon: HiOutlineUsers,
+            color: "#6366F1",
+            items: [],
+          },
         ],
       },
       {
@@ -152,14 +186,14 @@ export const NAV_DATA: NavSection[] = [
             url: "/dashboard/inventories/inventory",
             color: "#A78BFA",
 
-            icon: FaTruckRampBox ,
+            icon: FaTruckRampBox,
             items: [
               {
                 title: "عرض المستودع",
                 color: "#A78BFA",
 
                 url: "/dashboard/inventories/inventory",
-                icon: PiEyeDuotone ,
+                icon: PiEyeDuotone,
                 items: [],
               },
               {
@@ -167,62 +201,62 @@ export const NAV_DATA: NavSection[] = [
                 color: "#A78BFA",
 
                 url: "/dashboard/inventories/InventoryWithdraw",
-                icon: PiHandWithdrawDuotone ,
+                icon: PiHandWithdrawDuotone,
                 items: [],
               },
             ],
           },
           {
             title: "مستودع الانتاج ",
-             color: "#A78BFA",
+            color: "#A78BFA",
             url: "/dashboard/inventories/WarehouseTable",
-            icon: FaBoxesStacked ,
+            icon: FaBoxesStacked,
             items: [],
           },
         ],
       },
       {
         title: "الموظفين",
-        icon: FaUsersBetweenLines ,
-                                color:"#F43F5E",
+        icon: FaUsersBetweenLines,
+        color: "#F43F5E",
 
         items: [
           {
             title: "ادارة الموظفين",
             url: "/dashboard/HR/management",
-            icon: FaUsersGear  ,
-                        color:"#FB7185",
+            icon: FaUsersGear,
+            color: "#FB7185",
             items: [],
           },
           {
             title: "الدوام اليومي",
             url: "/dashboard/HR/attendance",
             icon: SlCalender,
-                        color:"#FB7185",
+            color: "#FB7185",
 
             items: [],
           },
           {
             title: " الإجازات",
             url: "/dashboard/HR/leaves",
-            icon: FcLeave ,
-                        color:"#FB7185",
+            icon: FcLeave,
+            color: "#FB7185",
 
             items: [],
           },
           {
             title: " المسحوبات",
             url: "/dashboard/HR/withdrawals",
-            icon: TbCashRegister ,
-                        color:"#FB7185",
+            icon: TbCashRegister,
+            color: "#FB7185",
 
             items: [],
           },
           {
             title: " دفع الرواتب",
             url: "/dashboard/HR/payroll",
-            icon: TbCashRegister ,
-                        color:"#FB7185",
+            icon: TbCashRegister,
+            color: "#FB7185",
 
             items: [],
           },
@@ -231,10 +265,9 @@ export const NAV_DATA: NavSection[] = [
       {
         title: "المستخدمين",
         url: "/dashboard/users",
-        icon: TfiUser ,
+        icon: TfiUser,
         items: [],
       },
-      
     ],
   },
 ];

@@ -195,6 +195,7 @@ export function WarehouseFormDrawer({
         <Group grow>
           <div className="mt-4 flex justify-center gap-2">
             <Button
+            fullWidth
               color="green"
               variant="light"
               radius="md"

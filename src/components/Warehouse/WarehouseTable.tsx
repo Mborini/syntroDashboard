@@ -7,7 +7,10 @@ import { Toast } from "@/lib/toast";
 import { WarehouseFilter } from "./WarehouseFilter";
 import { WarehouseFormDrawer } from "./WarehouseFormDrawer";
 import { PiPlusBold } from "react-icons/pi";
-import { getWarehouseItems, deleteWarehouseItem } from "@/services/warehouseServices";
+import {
+  getWarehouseItems,
+  deleteWarehouseItem,
+} from "@/services/warehouseServices";
 import { WarehouseItem } from "@/types/warehouse";
 import { TableSkeleton } from "../Common/skeleton";
 import { PencilIcon, Trash2 } from "lucide-react";
@@ -57,32 +60,39 @@ export function WarehouseTable() {
       Toast.error("فشل حذف المنتج");
     }
   };
-const handleFilter = (filters : any) => {
-  const today = new Date().toISOString().split("T")[0];
+const handleFilter = (filters: any) => {
+  const formatDateLocal = (dateString: string) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
   const selectedDate = filters.date
-    ? filters.date.toISOString().split("T")[0]
+    ? formatDateLocal(filters.date.toString())
     : null;
 
   const filtered = items.filter((item) => {
     const itemName = item.item_name || "";
     const itemWeight = item.weight || "";
     const itemQuantity = item.quantity || "";
-    const itemDate = item.production_date
-      ? new Date(item.production_date).toISOString().split("T")[0]
-      : "";
 
-    const dateChanged = selectedDate !== today; // ⭐ هل قام المستخدم بتغيير التاريخ؟
+    const itemDate = item.production_date
+      ? formatDateLocal(item.production_date)
+      : "";
 
     return (
       itemName.toLowerCase().includes(filters.name.toLowerCase()) &&
       itemWeight.toString().includes(filters.weight) &&
       itemQuantity.toString().includes(filters.quantity) &&
-      (!dateChanged || itemDate === selectedDate) // ⭐ فلترة التاريخ فقط إذا تم تغييره
+      (!selectedDate || itemDate === selectedDate)
     );
   });
 
   setFilteredItems(filtered);
 };
+
 
 
   if (loading) return <TableSkeleton columns={6} />;
@@ -107,7 +117,12 @@ const handleFilter = (filters : any) => {
       </Group>
 
       <ScrollArea>
-        <Table dir="rtl" striped highlightOnHover className="w-full rounded-lg bg-white text-center shadow-md">
+        <Table
+          dir="rtl"
+          striped
+          highlightOnHover
+          className="w-full rounded-lg bg-white text-center shadow-md"
+        >
           <Table.Thead>
             <Table.Tr>
               <Table.Th style={{ textAlign: "center" }}>الاسم</Table.Th>

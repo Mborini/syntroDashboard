@@ -247,7 +247,7 @@ const handleSave = async () => {
           <Text size="sm" className="col-span-2">
             الصنف
           </Text>
-          <Text size="sm">الوزن (ك)</Text>
+          <Text size="sm">الوزن (كغ)</Text>
           <Text size="sm">الكمية</Text>
           <Text size="sm">السعر الفردي</Text>
           <Text size="sm">الإجمالي</Text>
@@ -273,7 +273,7 @@ const handleSave = async () => {
                   )
                   .map((p) => ({
                     value: String(p.id),
-                    label: `${p.name}`,
+                    label: `${p.name} - ${p.weight} كغ`,
                   }))}
                 value={item.item_id ? String(item.item_id) : ""}
                 onChange={(val) => {
@@ -314,6 +314,9 @@ const handleSave = async () => {
 <NumberInput
   variant="filled"
   placeholder="الكمية"
+onKeyDown={(e) => {
+  if (e.key === "." || e.key === ",") e.preventDefault();
+}}
   value={item.qty}
   min={1}
   // إزالة max
