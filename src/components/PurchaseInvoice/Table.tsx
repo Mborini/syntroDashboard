@@ -99,27 +99,34 @@ export function PurchaseInvoiceTable() {
     setModalOpened(true);
   };
 
-const handleConfirmDelete = async () => {
-  if (!invoiceToDelete) return;
-  try {
-    await deletePurchaseInvoice(invoiceToDelete.id);
-    setInvoices(prev => prev.filter(c => c.id !== invoiceToDelete.id));
-    setFilteredInvoices(prev => prev.filter(c => c.id !== invoiceToDelete.id));
-    setModalOpened(false);
-    Toast.success("Invoice deleted successfully");
-  } catch (error: any) {
-    console.error(error);
+  const handleConfirmDelete = async () => {
+    if (!invoiceToDelete) return;
+    try {
+      await deletePurchaseInvoice(invoiceToDelete.id);
+      setInvoices((prev) => prev.filter((c) => c.id !== invoiceToDelete.id));
+      setFilteredInvoices((prev) =>
+        prev.filter((c) => c.id !== invoiceToDelete.id),
+      );
+      setModalOpened(false);
+      Toast.success("Invoice deleted successfully");
+    } catch (error: any) {
+      console.error(error);
 
-    if (error?.missingItems) {
-      const itemsList = error.missingItems
-        .map((i: any) => `${i.name}: مطلوب ${i.requiredQty}, موجود ${i.availableQty}`)
-        .join("\n");
-      Toast.error(`يجب إعادة الأصناف التالية إلى المستودع أولًا:\n${itemsList}`);
-    } else {
-      Toast.error(error.message || "Failed to delete invoice");
+      if (error?.missingItems) {
+        const itemsList = error.missingItems
+          .map(
+            (i: any) =>
+              `${i.name}: مطلوب ${i.requiredQty}, موجود ${i.availableQty}`,
+          )
+          .join("\n");
+        Toast.error(
+          `يجب إعادة الأصناف التالية إلى المستودع أولًا:\n${itemsList}`,
+        );
+      } else {
+        Toast.error(error.message || "Failed to delete invoice");
+      }
     }
-  }
-};
+  };
 
   const handleFilter = (query: string) => {
     const q = query.trim().toLowerCase();
@@ -186,8 +193,9 @@ const handleConfirmDelete = async () => {
                 const matchesEndDate = end ? invoiceDate <= end : true;
 
                 const matchesItemName = itemName
-                  ? inv.items.some((item) =>
-                      typeof item.name === "string" &&
+                  ? inv.items.some(
+                      (item) =>
+                        typeof item.name === "string" &&
                         item.name
                           .toLowerCase()
                           .includes(itemName.trim().toLowerCase()),
@@ -363,8 +371,7 @@ const handleConfirmDelete = async () => {
                   <Table.Td>
                     <Group className="justify-center" gap="xs">
                       <ActionIcon
-                                            radius="xl"
-
+                        radius="xl"
                         variant="subtle"
                         color="blue"
                         onClick={() => {
@@ -375,8 +382,7 @@ const handleConfirmDelete = async () => {
                         <EyeIcon size={18} />
                       </ActionIcon>
                       <ActionIcon
-                                            radius="xl"
-
+                        radius="xl"
                         variant="subtle"
                         color="orange"
                         onClick={(e) => {
@@ -388,8 +394,7 @@ const handleConfirmDelete = async () => {
                         <PencilIcon size={18} />
                       </ActionIcon>
                       <ActionIcon
-                                            radius="xl"
-
+                        radius="xl"
                         variant="subtle"
                         color="red"
                         onClick={(e) => {

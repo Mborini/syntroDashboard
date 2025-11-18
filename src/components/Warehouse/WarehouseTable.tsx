@@ -57,19 +57,33 @@ export function WarehouseTable() {
       Toast.error("فشل حذف المنتج");
     }
   };
+const handleFilter = (filters : any) => {
+  const today = new Date().toISOString().split("T")[0];
+  const selectedDate = filters.date
+    ? filters.date.toISOString().split("T")[0]
+    : null;
 
-  const handleFilter = (filters: { name: string; weight: string }) => {
-    const filtered = items.filter((item) => {
-      const itemName = item.item_name || "";
-      const itemWeight = item.weight || 0;
+  const filtered = items.filter((item) => {
+    const itemName = item.item_name || "";
+    const itemWeight = item.weight || "";
+    const itemQuantity = item.quantity || "";
+    const itemDate = item.production_date
+      ? new Date(item.production_date).toISOString().split("T")[0]
+      : "";
 
-      return (
-        itemName.toLowerCase().includes(filters.name.toLowerCase()) &&
-        itemWeight.toString().includes(filters.weight)
-      );
-    });
-    setFilteredItems(filtered);
-  };
+    const dateChanged = selectedDate !== today; // ⭐ هل قام المستخدم بتغيير التاريخ؟
+
+    return (
+      itemName.toLowerCase().includes(filters.name.toLowerCase()) &&
+      itemWeight.toString().includes(filters.weight) &&
+      itemQuantity.toString().includes(filters.quantity) &&
+      (!dateChanged || itemDate === selectedDate) // ⭐ فلترة التاريخ فقط إذا تم تغييره
+    );
+  });
+
+  setFilteredItems(filtered);
+};
+
 
   if (loading) return <TableSkeleton columns={6} />;
 
@@ -88,6 +102,7 @@ export function WarehouseTable() {
         >
           إضافة منتج
         </Button>
+
         <WarehouseFilter onFilter={handleFilter} />
       </Group>
 
@@ -134,6 +149,7 @@ export function WarehouseTable() {
                       >
                         <PencilIcon size={18} />
                       </Button>
+
                       <Button
                         size="xs"
                         color="red"
@@ -151,6 +167,7 @@ export function WarehouseTable() {
         </Table>
       </ScrollArea>
 
+      {/* حذف */}
       <ConfirmModal
         opened={modalOpened}
         onClose={() => setModalOpened(false)}
@@ -160,6 +177,7 @@ export function WarehouseTable() {
         color="red"
       />
 
+      {/* إضافة / تعديل */}
       <WarehouseFormDrawer
         opened={formOpened}
         onClose={() => setFormOpened(false)}

@@ -12,5 +12,6 @@ export type WarehouseItem = {
 export type WarehouseFilterDTO = {
   name: string;
   weight: string;
+  date: Date | null;
   quantity: string;
 };

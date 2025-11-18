@@ -152,7 +152,7 @@ export function WarehouseFormDrawer({
           }}
           data={items.map((s) => ({
             value: String(s.id),
-            label: s.name,
+            label: s.name + (s.weight ? ` - ${s.weight} كغ` : ""),
           }))}
         />
 

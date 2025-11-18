@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Drawer, NumberInput, Textarea, Button } from "@mantine/core";
 import { Toast } from "@/lib/toast";
 import { withdrawFromInventory } from "@/services/inventoryServices";
@@ -22,6 +22,12 @@ export function InventoryWithdrawDrawer({
   const [notes, setNotes] = useState("");
 
   const [isSaving, setIsSaving] = useState(false);
+useEffect(() => {
+  if (!opened) {
+    setQuantity(0);
+    setNotes("");
+  }
+}, [opened]);
 
   const handleWithdraw = async () => {
     if (!item) return;
