@@ -106,7 +106,7 @@ const toggleItem = (key: string) => {
       opened={isOpen}
       onClose={toggleSidebar}
       padding={0}
-      size="40%"
+      size="60%"
       position="right"
       withCloseButton={false}
     >
