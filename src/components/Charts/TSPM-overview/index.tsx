@@ -16,7 +16,6 @@ export function TSPM({ timeFrame = "monthly", className }: PropsType) {
     const fetchData = async () => {
       try {
         const salesData = await getSalesData();
-        console.log("Sales Data:", salesData);
 
         // تحويل البيانات إلى الشكل المطلوب من ApexCharts
         const formatted = salesData.TSPM.map((item: any) => ({

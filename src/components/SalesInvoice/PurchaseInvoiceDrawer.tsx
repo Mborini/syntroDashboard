@@ -99,7 +99,6 @@ export function SalesInvoiceDrawer({
         }));
 
         setSalesItems(formattedData);
-        console.log("Sales items loaded:", formattedData);
       } catch (error) {
         console.error("Failed to fetch sales items:", error);
       }

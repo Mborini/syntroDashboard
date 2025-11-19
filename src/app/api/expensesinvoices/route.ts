@@ -13,7 +13,6 @@ export async function GET() {
   LEFT JOIN expenses_types s ON pi.expense_type_id = s.id
   ORDER BY pi.id ASC`
     );
-console.log(invoicesRes.rows);
     const itemsRes = await client.query(
       `SELECT * FROM expenses_invoice_items ORDER BY id ASC;`
     );

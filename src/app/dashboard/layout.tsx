@@ -1,10 +1,10 @@
 // dashboard/layout.tsx
-import { Sidebar } from "@/components/Layouts/sidebar";
 import { Header } from "@/components/Layouts/header";
 import type { PropsWithChildren } from "react";
 import { getServerSession } from "next-auth/next";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/authOptions";
+import { Sidebar } from "@/components/Layouts/sidebar/data/NewSidebar";
 
 export default async function DashboardLayout({ children }: PropsWithChildren) {
   const session = await getServerSession(authOptions);
@@ -14,7 +14,6 @@ export default async function DashboardLayout({ children }: PropsWithChildren) {
   return ( 
     <div className="flex min-h-screen">
       
-
       <div className="w-full bg-gray-2 dark:bg-[#020d1a]">
         <Header />
 
@@ -23,7 +22,8 @@ export default async function DashboardLayout({ children }: PropsWithChildren) {
           {children}
         
         </main>
-      </div><Sidebar />
+      </div>
+ <Sidebar /> {/* Sidebar هنا */}
     </div>
   );
 }

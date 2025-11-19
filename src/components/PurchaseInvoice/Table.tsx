@@ -56,7 +56,6 @@ export function PurchaseInvoiceTable() {
     setLoading(true);
     try {
       const data = await getPurchaseInvoices();
-      console.log(data);
       setInvoices(data);
       setFilteredInvoices(data);
     } catch (error) {
