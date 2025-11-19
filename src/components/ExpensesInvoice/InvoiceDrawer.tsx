@@ -177,7 +177,7 @@ const [expenseTypes, setExpenseTypes] = useState<{ id: number; name: string }[]>
           />
           <Select
   variant="filled"
-  label="نوع المصاريف"
+  label="نوع المصروف / الجهة"
   placeholder="اختر النوع"
   value={expenseTypeId ? String(expenseTypeId) : ""}
   onChange={(val) => setExpenseTypeId(val ? Number(val) : 0)}
