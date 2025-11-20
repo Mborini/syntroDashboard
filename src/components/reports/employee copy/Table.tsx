@@ -137,117 +137,97 @@ export function MonthlyReportReset() {
       maximumFractionDigits: 2,
     });
 
-  // Build the printable HTML exactly in the layout you wanted
-  const handlePrint = () => {
-    if (!summary) return;
+const handlePrint = () => {
+  if (!summary) return;
 
-    const sections = [
-      {
-        title: "المبيعات",
-        rows: [
-          {
-            label: "المبيعات النقدية",
-            value: summary.cashSales,
-            positive: true,
-          },
-          {
-            label: "المبيعات الآجلة",
-            value: summary.creditSales,
-            positive: true,
-          },
-        ],
-      },
-      {
-        title: "المشتريات",
-        rows: [
-          {
-            label: "المشتريات النقدية",
-            value: summary.cashPurchases,
-            positive: false,
-          },
-          {
-            label: "المشتريات الآجلة",
-            value: summary.creditPurchases,
-            positive: false,
-          },
-        ],
-      },
-      {
-        title: "المصاريف",
-        rows: [
-          {
-            label: "المصاريف النقدية",
-            value: summary.cashExpenses,
-            positive: false,
-          },
-          {
-            label: "المصاريف الآجلة",
-            value: summary.creditExpenses,
-            positive: false,
-          },
-        ],
-      },
-      {
-        title: "الرواتب",
-        rows: [{ label: "الرواتب", value: summary.salaries, positive: false }],
-      },
-    ];
+  const sections = [
+    {
+      title: "المبيعات",
+      rows: [
+        { label: "المبيعات النقدية", value: summary.cashSales, positive: true },
+        { label: "المبيعات الآجلة", value: summary.creditSales, positive: true },
+      ],
+    },
+    {
+      title: "المشتريات",
+      rows: [
+        { label: "المشتريات النقدية", value: summary.cashPurchases, positive: false },
+        { label: "المشتريات الآجلة", value: summary.creditPurchases, positive: false },
+      ],
+    },
+    {
+      title: "المصاريف",
+      rows: [
+        { label: "المصاريف النقدية", value: summary.cashExpenses, positive: false },
+        { label: "المصاريف الآجلة", value: summary.creditExpenses, positive: false },
+      ],
+    },
+    {
+      title: "الرواتب",
+      rows: [{ label: "الرواتب", value: summary.salaries, positive: false }],
+    },
+  ];
 
-    // build HTML content
-    let html = `
-      <div dir="rtl" style="font-family: Arial, sans-serif; padding: 20px; color: #111;">
-        <h2 style="text-align:center; margin-bottom: 10px;">تقرير المبيعات لشهر ${month}</h2>
-        <hr />
-    `;
+  const html = `
+    <div dir="rtl" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding:30px; color:#333;">
+      <h1 style="text-align:center; font-size:24px; margin-bottom:20px;">التقرير المالي لشهر ${month}</h1>
+      <table style="width:100%; border-collapse: collapse; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+        <thead>
+          <tr style="background-color:#f0f0f0;">
+            <th style="padding:12px; border-bottom:1px solid #ccc; text-align:right; font-size:16px;">البند</th>
+            <th style="padding:12px; border-bottom:1px solid #ccc; text-align:right; font-size:16px;">القيمة (JD)</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${sections.map(sec => `
+            <tr style="background-color:#fafafa;">
+              <td colspan="2" style="padding:10px; font-weight:bold; border-bottom:1px solid #ccc;">${sec.title}</td>
+            </tr>
+            ${sec.rows.map(r => `
+              <tr>
+                <td style="padding:8px; border-bottom:1px solid #eee;">${r.label}</td>
+                <td style="padding:8px; border-bottom:1px solid #eee; text-align:right; color:${r.positive ? "green" : "red"}; font-weight:600;">
+                  ${r.positive ? "+" : "-"} ${fmt(r.value)}
+                </td>
+              </tr>
+            `).join('')}
+          `).join('')}
+          <tr style="background-color:#e0f7fa;">
+            <td style="padding:10px; font-weight:bold; font-size:18px; border-top:2px solid #ccc;">صافي الربح</td>
+            <td style="padding:10px; font-weight:bold; font-size:18px; text-align:right; color:${summary.netProfit >=0 ? "green" : "red"}; border-top:2px solid #ccc;">
+              ${summary.netProfit >=0 ? "+" : "-"} ${fmt(Math.abs(summary.netProfit))}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  `;
 
-    sections.forEach((sec) => {
-      html += `<h3 style="margin-top:18px; margin-bottom:8px;">${sec.title}</h3>`;
-      sec.rows.forEach((r) => {
-        const sign = r.positive ? "+" : "-";
-        html += `
-          <div style="margin-bottom: 10px;">
-            <div style="font-weight:600; margin-bottom:6px;">${r.label}</div>
-            <div style="font-size:18px; font-weight:700;">${sign} ${fmt(r.value)} JD</div>
-          </div>
-        `;
-      });
-    });
+  const win = window.open("", "_blank", "width=900,height=700");
+  if (!win) return;
+  win.document.write(`
+    <html dir="rtl">
+      <head>
+        <title>طباعة التقرير المالي</title>
+        <meta charset="utf-8" />
+        <style>
+          body { margin:0; padding:0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+          @media print {
+            @page { margin:20mm; }
+            button { display:none; }
+          }
+        </style>
+      </head>
+      <body>${html}</body>
+    </html>
+  `);
+  win.document.close();
+  setTimeout(() => {
+    win.focus();
+    win.print();
+  }, 300);
+};
 
-    // صافي الربح في النهاية
-    const netSign = summary.netProfit >= 0 ? "+" : "-";
-    html += `
-      <hr style="margin-top:18px;" />
-      <h3 style="margin-top:16px; margin-bottom:8px;">صافي الربح</h3>
-      <div style="font-size:20px; font-weight:800;">${netSign} ${fmt(Math.abs(summary.netProfit))} JD</div>
-      </div>
-    `;
-
-    // Open new window and print
-    const win = window.open("", "_blank", "width=800,height=700");
-    if (!win) return;
-    win.document.write(`
-      <html dir="rtl">
-        <head>
-          <title>طباعة التقرير</title>
-          <meta charset="utf-8" />
-          <style>
-            body { margin: 0; padding: 0; font-family: Arial, sans-serif; }
-            @media print {
-              @page { margin: 20mm; }
-              button { display: none; }
-            }
-          </style>
-        </head>
-        <body>${html}</body>
-      </html>
-    `);
-    win.document.close();
-    // give browser a tiny moment to render before calling print
-    setTimeout(() => {
-      win.focus();
-      win.print();
-    }, 300);
-  };
 
   if (!summary) return <Text c="red">No data available</Text>;
 
