@@ -308,60 +308,68 @@ export function MonthlyReportReset() {
   ];
 
   return (
-    <div style={{ display: "flex", justifyContent: "center", width: "100%" }}>
-      <div style={{ width: "50%" }}>
-        <Group mb="sm">
-          <Button
-            variant="light"
-            color="blue"
-            onClick={handlePrint}
-          >
-            <FaPrint size={"16"} />
-          </Button>
-        </Group>
+  <div
+  style={{
+    display: "flex",
+    justifyContent: "center",
+    width: "100%",
+    padding: "10px",
+  }}
+>
+  <div
+    style={{
+      width: "100%",
+      maxWidth: "700px",
+    }}
+  >
+    <Group mb="sm">
+      <Button variant="light" color="blue" onClick={handlePrint}>
+        <FaPrint size={"16"} />
+      </Button>
+    </Group>
 
-        <Card
-          dir="rtl"
-          shadow="lg"
-          padding="xl"
-          w={"100%"}
-          radius="xl"
-          withBorder
-          pos="relative"
-        >
-          <LoadingOverlay visible={loading} />
+    <Card
+      dir="rtl"
+      shadow="lg"
+      padding="xl"
+      w={"100%"}
+      radius="xl"
+      withBorder
+      pos="relative"
+    >
+      <LoadingOverlay visible={loading} />
 
-          <Group justify="space-between" mb="md">
-            <Text fw={700} size="xl">
-              التقرير المالي لشهر: {month}
-            </Text>
+      <Group justify="space-between" mb="md" wrap="wrap" gap="md">
+        <Text fw={700} size="xl">
+          التقرير المالي لشهر: {month}
+        </Text>
 
-            <TextInput
-              radius={"md"}
-              value={
-                selectedDate
-                  ? `${selectedDate.getFullYear()}-${(
-                      selectedDate.getMonth() + 1
-                    )
-                      .toString()
-                      .padStart(2, "0")}`
-                  : ""
-              }
-              onChange={(event) => {
-                const val = event.currentTarget.value;
-                if (val) {
-                  const [year, month] = val.split("-");
-                  setSelectedDate(new Date(Number(year), Number(month) - 1));
-                } else {
-                  setSelectedDate(null);
-                }
-              }}
-              type="month"
-              maw={200}
-            />
-          </Group>
+        <TextInput
+          radius={"md"}
+          value={
+            selectedDate
+              ? `${selectedDate.getFullYear()}-${(
+                  selectedDate.getMonth() + 1
+                )
+                  .toString()
+                  .padStart(2, "0")}`
+              : ""
+          }
+          onChange={(event) => {
+            const val = event.currentTarget.value;
+            if (val) {
+              const [year, month] = val.split("-");
+              setSelectedDate(new Date(Number(year), Number(month) - 1));
+            } else {
+              setSelectedDate(null);
+            }
+          }}
+          type="month"
+          maw={200}
+        />
+      </Group>
 
-          <Divider mb="lg" />
+      <Divider mb="lg" />
 
           <Timeline active={items.length} bulletSize={26} lineWidth={2}>
             {items.map((section, i) => (
