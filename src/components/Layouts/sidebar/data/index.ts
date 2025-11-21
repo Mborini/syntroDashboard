@@ -59,7 +59,7 @@ export interface NavSection {
 
 export const NAV_DATA: NavSection[] = [
   {
-    label: "MAIN MENU",
+    label: " ",
     items: [
       {
         title: "الصفحة الرئيسية",

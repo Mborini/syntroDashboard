@@ -23,7 +23,7 @@ export function UserInfo() {
             </Avatar>
 
             <div className="hidden md:block">
-              <Text size="sm" fw={500}>
+              <Text size="sm" fw={500} >
                 {session?.user?.username}
               </Text>
             </div>

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { KeyRound, UserRound, Eye, EyeOff } from "lucide-react";
 import InputGroup from "@/components/FormElements/InputGroup";
+import { TextInput } from "@mantine/core";
 
 export default function SigninWithPassword() {
   const router = useRouter();
@@ -47,38 +48,41 @@ export default function SigninWithPassword() {
   }}
 >
       {/* Username Field */}
-      <div className="w-full">
-        <InputGroup
+      <div className="w-full " dir="rtl">
+        <TextInput
           type="text"
-          label="User Name"
-          placeholder="Enter your user name"
+          label="اسم المستخدم"
+          placeholder="أدخل اسم المستخدم"
           name="username"
-          handleChange={handleChange}
+          onChange={handleChange}
           value={formData.username}
-          icon={<UserRound />}
-          className="w-full"
+          radius={"md"}
+          className="w-full dir-rtl"
+          leftSection={<UserRound size={16} className="text-gray-500" />}
         />
       </div>
 
       {/* Password Field appears automatically after username */}
       <div
+      dir="rtl"
         className={`transition-opacity duration-500 ${
           formData.username ? "opacity-100 mt-2" : "opacity-0 pointer-events-none"
         }`}
       >
-        <InputGroup
+        <TextInput
           type={showPassword ? "text" : "password"}
-          label="Password"
-          placeholder="Enter your password"
+          label="كلمة المرور"
+          placeholder="أدخل كلمة المرور"
           name="password"
-          handleChange={handleChange}
+          onChange={handleChange}
           value={formData.password}
-          icon={
+          leftSection={
             <div onClick={() => setShowPassword(!showPassword)} className="cursor-pointer">
               {showPassword ? <EyeOff /> : <Eye />}
             </div>
           }
-          className="w-full"
+          radius={"md"}
+          className="w-full "
         />
       </div>
 
@@ -93,7 +97,7 @@ export default function SigninWithPassword() {
           disabled={loading}
           className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary p-4 font-medium text-white hover:bg-opacity-90 transition"
         >
-          Sign In
+          تسجيل الدخول
           {loading && (
             <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-white border-t-transparent" />
           )}

@@ -1,49 +1,140 @@
 "use client";
 
-import { SearchIcon } from "@/assets/icons";
+import { useState, useMemo } from "react";
+import Link from "next/link";
 import { useSidebarContext } from "../sidebar/sidebar-context";
-import { MenuIcon } from "./icons";
-import { Notification } from "./notification";
+import { NAV_DATA, NavItem } from "../sidebar/data";
 import { UserInfo } from "./user-info";
+import {
+  TextInput,
+  Modal,
+  ScrollArea,
+  Avatar,
+  Text,
+} from "@mantine/core";
+import { Logo } from "@/components/logo";
+import { FiSearch } from "react-icons/fi";
 
 export function Header() {
   const { toggleSidebar } = useSidebarContext();
+  const [search, setSearch] = useState("");
+  const [modalOpened, setModalOpened] = useState(false);
+
+  // فلترة العناصر بشكل recursive
+  const filterNavItems = (items: NavItem[], query: string): NavItem[] => {
+    return items.flatMap((item) => {
+      const filteredSub = filterNavItems(item.items, query);
+      if (
+        (item.url && item.title.toLowerCase().includes(query.toLowerCase())) ||
+        filteredSub.length > 0
+      ) {
+        return { ...item, items: filteredSub };
+      }
+      return [];
+    });
+  };
+
+  const filteredNav = useMemo(() => {
+    if (!search) return [];
+    return NAV_DATA.flatMap((section) => filterNavItems(section.items, search));
+  }, [search]);
 
   return (
-    <header className="sticky top-0 z-30 flex items-center justify-between border-b border-stroke bg-white px-4 py-5 shadow-1 dark:border-stroke-dark dark:bg-gray-dark md:px-5 2xl:px-10">
-      
-
-      <div className="max-xl:hidden">
-        <h1 className="mb-0.5 text-heading-5 font-bold text-dark dark:text-white">
-          Managment system
-        </h1>
+    <header className="sticky top-0 z-30 flex items-center justify-between border-b border-stroke bg-white px-4 py-3 shadow-md dark:border-stroke-dark dark:bg-gray-dark md:px-5 2xl:px-10">
+      {/* الشعار على اليسار */}
+      <div className="flex items-center gap-2">
+        <Logo width={130} height={100} />
       </div>
 
-      <div className="flex flex-1 items-center justify-end gap-2 min-[375px]:gap-4">
-        <div className="relative w-full max-w-[300px]">
-          <input
-            type="search"
-            placeholder="Search"
-            className="flex w-full items-center gap-3.5 rounded-full border bg-gray-2 py-3 pl-[53px] pr-5 outline-none transition-colors focus-visible:border-primary dark:border-dark-3 dark:bg-dark-2 dark:hover:border-dark-4 dark:hover:bg-dark-3 dark:hover:text-dark-6 dark:focus-visible:border-primary"
-          />
+<div className="flex-1 justify-center hidden lg:flex">
+  <Text size="xl" fw={700}>
+    نظام الادارة المالية المتكامل
+  </Text>
+</div>
 
-          <SearchIcon className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 max-[1015px]:size-5" />
-        </div>
 
-        
 
-        <Notification />
 
-        <div className="shrink-0">
-          <UserInfo />
-        </div><button
-        onClick={toggleSidebar}
-        className="rounded-lg border px-1.5 py-1 dark:border-stroke-dark dark:bg-[#020D1A] hover:dark:bg-[#FFFFFF1A] lg:hidden"
+      {/* أيقونة البحث + UserInfo + زر القائمة الجانبية على اليمين */}
+      <div className="flex items-center gap-3">
+        <Avatar
+          radius="xl"
+          size={45}
+          color="blue"
+          className="cursor-pointer"
+          onClick={() => setModalOpened(true)}
+        >
+          <FiSearch size={20} />
+        </Avatar>
+        <UserInfo />
+        <button
+          onClick={toggleSidebar}
+          className="rounded-lg border px-2 py-1 lg:hidden"
+        >
+          ☰
+        </button>
+      </div>
+
+      {/* مودال البحث */}
+      <Modal
+        opened={modalOpened}
+        onClose={() => setModalOpened(false)}
+        title="نتائج البحث"
+        size="md"
+        centered
+        dir="rtl"
       >
-        <MenuIcon />
-        <span className="sr-only">Toggle Sidebar</span>
-      </button>
-      </div>
+        <TextInput
+          dir="rtl"
+          variant="filled"
+          size="md"
+          radius="xl"
+          placeholder="ابحث..."
+          leftSection={<FiSearch className="text-gray-500" />}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="mb-4"
+        />
+
+        <ScrollArea style={{ height: 300 }}>
+          {filteredNav.length > 0 ? (
+            filteredNav.map((item) =>
+              item.url ? (
+                <Link
+                  key={item.title}
+                  href={item.url}
+                  onClick={() => {
+                    setSearch("");
+                    setModalOpened(false);
+                  }}
+                  className="block rounded px-4 py-2 hover:bg-gray-100 dark:hover:bg-dark-3"
+                >
+                  {item.title}
+                </Link>
+              ) : (
+                item.items.map(
+                  (sub) =>
+                    sub.url && (
+                      <Link
+                        key={sub.title}
+                        href={sub.url}
+                        onClick={() => {
+                          setSearch("");
+                          setModalOpened(false);
+                        }}
+                        className="block rounded px-4 py-2 hover:bg-gray-100 dark:hover:bg-dark-3"
+                      >
+                        {sub.title}
+                      </Link>
+                    ),
+                )
+              ),
+            )
+          ) : (
+            <p className="text-center text-gray-500">لا توجد نتائج</p>
+          )}
+        </ScrollArea>
+      </Modal>
     </header>
   );
 }
