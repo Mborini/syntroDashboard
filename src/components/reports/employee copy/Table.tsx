@@ -22,7 +22,8 @@ import {
   TrendingDown,
 } from "lucide-react";
 import { FaCar, FaMinus, FaPlus, FaPrint } from "react-icons/fa6";
-
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 type FinancialSummary = {
   cashSales: number;
   creditSales: number;
@@ -136,6 +137,73 @@ export function MonthlyReportReset() {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     });
+
+
+const handlePrintPDF = () => {
+  if (!summary) return;
+
+  const doc = new jsPDF({
+    orientation: "p", // portrait
+    unit: "mm",
+    format: [80, 200], // 80mm width, height will grow automatically
+  });
+
+  doc.setFontSize(12);
+  doc.setFont("helvetica", "bold");
+  doc.text("Financial Report", 40, 10, { align: "center" });
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "normal");
+  doc.text(`Month: ${month}`, 40, 18, { align: "center" });
+
+  const lineHeight = 6;
+  let y = 28;
+
+  const addSection = (title: string, rows: { label: string; value: number }[]) => {
+    doc.setFont("helvetica", "bold");
+    doc.text(title, 5, y);
+    y += lineHeight;
+
+    doc.setFont("helvetica", "normal");
+    rows.forEach((r) => {
+      doc.text(r.label, 5, y);
+      doc.text(r.value.toFixed(2) + " JD", 70, y, { align: "right" });
+      y += lineHeight;
+    });
+
+    y += 2;
+    doc.setDrawColor(0);
+    doc.line(5, y, 75, y); // horizontal line
+    y += 4;
+  };
+
+  addSection("Sales", [
+    { label: "Cash Sales", value: summary.cashSales },
+    { label: "Credit Sales", value: summary.creditSales },
+  ]);
+
+  addSection("Purchases", [
+    { label: "Cash Purchases", value: summary.cashPurchases },
+    { label: "Credit Purchases", value: summary.creditPurchases },
+  ]);
+
+  addSection("Expenses", [
+    { label: "Cash Expenses", value: summary.cashExpenses },
+    { label: "Credit Expenses", value: summary.creditExpenses },
+  ]);
+
+  addSection("Salaries", [{ label: "Salaries", value: summary.salaries }]);
+
+  doc.setFont("helvetica", "bold");
+  doc.text("Net Profit", 5, y);
+  doc.text(
+    (summary.netProfit >= 0 ? "+" : "-") + Math.abs(summary.netProfit).toFixed(2) + " JD",
+    70,
+    y,
+    { align: "right" }
+  );
+
+  doc.save(`Financial_Report_${month}.pdf`);
+};
 
 const handlePrint = () => {
   if (!summary) return;
@@ -281,6 +349,9 @@ ${line}
     <Group mb="sm">
       <Button variant="light" color="blue" onClick={handlePrint}>
         <FaPrint size={"16"} />
+      </Button>
+      <Button variant="light" color="blue" onClick={handlePrintPDF}>
+        <Printer size={16} />
       </Button>
     </Group>
 
