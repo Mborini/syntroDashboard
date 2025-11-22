@@ -140,93 +140,69 @@ export function MonthlyReportReset() {
 const handlePrint = () => {
   if (!summary) return;
 
-  const sections = [
-    {
-      title: "المبيعات",
-      rows: [
-        { label: "المبيعات النقدية", value: summary.cashSales, positive: true },
-        { label: "المبيعات الآجلة", value: summary.creditSales, positive: true },
-      ],
-    },
-    {
-      title: "المشتريات",
-      rows: [
-        { label: "المشتريات النقدية", value: summary.cashPurchases, positive: false },
-        { label: "المشتريات الآجلة", value: summary.creditPurchases, positive: false },
-      ],
-    },
-    {
-      title: "المصاريف",
-      rows: [
-        { label: "المصاريف النقدية", value: summary.cashExpenses, positive: false },
-        { label: "المصاريف الآجلة", value: summary.creditExpenses, positive: false },
-      ],
-    },
-    {
-      title: "الرواتب",
-      rows: [{ label: "الرواتب", value: summary.salaries, positive: false }],
-    },
-  ];
+  const line = "-------------------------------";
 
-  const html = `
-    <div dir="rtl" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding:30px; color:#333;">
-      <h1 style="text-align:center; font-size:24px; margin-bottom:20px;">التقرير المالي لشهر ${month}</h1>
-      <table style="width:100%; border-collapse: collapse; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
-        <thead>
-          <tr style="background-color:#f0f0f0;">
-            <th style="padding:12px; border-bottom:1px solid #ccc; text-align:right; font-size:16px;">البند</th>
-            <th style="padding:12px; border-bottom:1px solid #ccc; text-align:right; font-size:16px;">القيمة (JD)</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${sections.map(sec => `
-            <tr style="background-color:#fafafa;">
-              <td colspan="2" style="padding:10px; font-weight:bold; border-bottom:1px solid #ccc;">${sec.title}</td>
-            </tr>
-            ${sec.rows.map(r => `
-              <tr>
-                <td style="padding:8px; border-bottom:1px solid #eee;">${r.label}</td>
-                <td style="padding:8px; border-bottom:1px solid #eee; text-align:right; color:${r.positive ? "green" : "red"}; font-weight:600;">
-                  ${r.positive ? "+" : "-"} ${fmt(r.value)}
-                </td>
-              </tr>
-            `).join('')}
-          `).join('')}
-          <tr style="background-color:#e0f7fa;">
-            <td style="padding:10px; font-weight:bold; font-size:18px; border-top:2px solid #ccc;">صافي الربح</td>
-            <td style="padding:10px; font-weight:bold; font-size:18px; text-align:right; color:${summary.netProfit >=0 ? "green" : "red"}; border-top:2px solid #ccc;">
-              ${summary.netProfit >=0 ? "+" : "-"} ${fmt(Math.abs(summary.netProfit))}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+  const printText = `
+  <div dir="rtl" style="font-family: sans-serif; width: 80mm; padding: 5px;">
+    <h2 style="text-align:center; margin:0;">التقرير المالي</h2>
+    <h3 style="text-align:center; margin:0 0 10px 0;">شهر ${month}</h3>
+
+    <pre style="font-size:14px; white-space: pre-wrap;">
+
+${line}
+المبيعات
+${line}
+المبيعات النقدية        ${summary.cashSales.toFixed(2)}
+المبيعات الآجلة         ${summary.creditSales.toFixed(2)}
+
+${line}
+المشتريات
+${line}
+المشتريات النقدية       ${summary.cashPurchases.toFixed(2)}
+المشتريات الآجلة        ${summary.creditPurchases.toFixed(2)}
+
+${line}
+المصاريف
+${line}
+المصاريف النقدية        ${summary.cashExpenses.toFixed(2)}
+المصاريف الآجلة         ${summary.creditExpenses.toFixed(2)}
+
+${line}
+الرواتب
+${line}
+الرواتب                 ${summary.salaries.toFixed(2)}
+
+${line}
+صافي الربح
+${line}
+${summary.netProfit >= 0 ? "ربح" : "خسارة"}: ${summary.netProfit.toFixed(2)}
+${line}
+
+    </pre>
+  </div>
   `;
 
-  const win = window.open("", "_blank", "width=900,height=700");
-  if (!win) return;
-  win.document.write(`
-    <html dir="rtl">
-      <head>
-        <title>طباعة التقرير المالي</title>
-        <meta charset="utf-8" />
-        <style>
-          body { margin:0; padding:0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-          @media print {
-            @page { margin:20mm; }
-            button { display:none; }
-          }
-        </style>
-      </head>
-      <body>${html}</body>
-    </html>
-  `);
-  win.document.close();
-  setTimeout(() => {
+  const win = window.open("", "_blank", "width=300,height=600");
+  if (win) {
+    win.document.write(`
+      <html dir="rtl">
+        <head>
+          <meta charset="UTF-8" />
+          <style>
+            @page { size: 80mm auto; margin: 0; }
+            body { margin:0; }
+          </style>
+        </head>
+        <body>${printText}</body>
+      </html>
+    `);
+
+    win.document.close();
     win.focus();
-    win.print();
-  }, 300);
+    setTimeout(() => win.print(), 300);
+  }
 };
+
 
 
   if (!summary) return <Text c="red">No data available</Text>;
