@@ -5,7 +5,7 @@ import { PencilIcon, Trash2, UserPlus } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { Toast } from "@/lib/toast";
-import { LeaveDrawer } from "./LeaveDrawer";
+
 import { createLeave, deleteLeave, getLeaves, updateLeave } from "@/services/leaveServices";
 import { Leave } from "@/types/leave";
 import ConfirmModal from "@/components/Common/ConfirmModal";
@@ -125,12 +125,7 @@ export function LeavesTable() {
         </div>
         </ScrollArea>
 
-      <LeaveDrawer
-        opened={drawerOpened}
-        onClose={() => setDrawerOpened(false)}
-        leave={selectedLeave}
-        onSubmit={handleSubmit}
-      />
+   
 
       <ConfirmModal
         opened={modalOpened}
