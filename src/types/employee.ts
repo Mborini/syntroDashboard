@@ -4,6 +4,7 @@ export interface Vehicle {
   plate: string;
   type: string;
   sub_fleet: string;
+  subFleet:string;
   fleet: string;
   isGarbageTruck: boolean;
   company: string;

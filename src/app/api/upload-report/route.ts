@@ -37,7 +37,7 @@ const parseArabicExcelDate = (value: string) => {
 
   // تحويل / إلى - (اختياري لتحسين parsing)
   const match = v.match(
-    /(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2}):(\d{2})\s*(AM|PM)?/i
+    /(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2}):(\d{2})\s*(AM|PM)?/i,
   );
 
   if (!match) return null;
@@ -55,7 +55,7 @@ const parseArabicExcelDate = (value: string) => {
     Number(day),
     h,
     Number(min),
-    Number(sec)
+    Number(sec),
   );
 };
 /**
@@ -68,7 +68,7 @@ function getDistanceMeters(
   lat1: number,
   lon1: number,
   lat2: number,
-  lon2: number
+  lon2: number,
 ) {
   const R = 6371000;
   const toRad = (v: number) => (v * Math.PI) / 180;
@@ -78,9 +78,7 @@ function getDistanceMeters(
 
   const a =
     Math.sin(dLat / 2) ** 2 +
-    Math.cos(toRad(lat1)) *
-      Math.cos(toRad(lat2)) *
-      Math.sin(dLon / 2) ** 2;
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
@@ -111,7 +109,7 @@ async function getVehicleTsId(plate: string) {
   try {
     const res = await client.query(
       "SELECT ts_id, id FROM vehicles WHERE plate = $1",
-      [plate]
+      [plate],
     );
     return res.rows[0] || null;
   } finally {
@@ -122,7 +120,12 @@ async function getVehicleTsId(plate: string) {
 async function fetchTrackingData(tsId: string, from: string, to: string) {
   if (!tsId) return { polyline: null, totalLiftCount: 0, visitedpoints: [] };
   const session = await getServerSession(authOptions);
-  return await fetchTrackingFromGAM(tsId, from, to, session?.sessionValue || null);
+  return await fetchTrackingFromGAM(
+    tsId,
+    from,
+    to,
+    session?.sessionValue || null,
+  );
 }
 
 /**
@@ -144,19 +147,19 @@ export async function POST(req: NextRequest) {
     const workbook = XLSX.read(buffer, { type: "buffer" });
 
     const infoData: any[] = XLSX.utils.sheet_to_json(
-      workbook.Sheets["معلومات المركبة"]
+      workbook.Sheets["معلومات المركبة"],
     );
 
     const rawActivityData: any[] = XLSX.utils.sheet_to_json(
-      workbook.Sheets["عرض البيانات"]
+      workbook.Sheets["عرض البيانات"],
     );
 
     const summaryData: any[] = XLSX.utils.sheet_to_json(
-      workbook.Sheets["الملخص"]
+      workbook.Sheets["الملخص"],
     );
 
     const alertsData: any[] = XLSX.utils.sheet_to_json(
-      workbook.Sheets["التنبيهات"]
+      workbook.Sheets["التنبيهات"],
     );
 
     const plateNumber = String(infoData[0]["رقم اللوحة"]).trim();
@@ -170,15 +173,14 @@ export async function POST(req: NextRequest) {
     let endTimeApi = "";
 
     if (rawActivityData.length > 0) {
-      const firstDateTime = parseArabicExcelDate(
-        rawActivityData[0]["التاريخ"]
-      );
+      const firstDateTime = parseArabicExcelDate(rawActivityData[0]["التاريخ"]);
 
       const lastDateTime = parseArabicExcelDate(
-        rawActivityData[rawActivityData.length - 1]["التاريخ"]
+        rawActivityData[rawActivityData.length - 1]["التاريخ"],
       );
 
-      const formatDateTime = (d: Date) => {
+      const formatDateTime = (d: Date | null) => {
+        if (!d || isNaN(d.getTime())) return "";
         const y = d.getFullYear();
         const m = String(d.getMonth() + 1).padStart(2, "0");
         const day = String(d.getDate()).padStart(2, "0");
@@ -189,37 +191,40 @@ export async function POST(req: NextRequest) {
 
       startTimeApi = formatDateTime(firstDateTime);
       endTimeApi = formatDateTime(lastDateTime);
+
+      if (!startTimeApi || !endTimeApi) {
+        throw new Error("Invalid date range in uploaded report activity data");
+      }
+    } else {
+      throw new Error("No activity data found in uploaded report");
     }
-const toDbDate = (d: any) => {
-  if (!d) return null;
+    const toDbDate = (d: any) => {
+      if (!d) return null;
 
-  const date = parseArabicExcelDate(d);
+      const date = parseArabicExcelDate(d);
 
-  if (!date || isNaN(date.getTime())) return null;
+      if (!date || isNaN(date.getTime())) return null;
 
-  return date.toISOString().replace("T", " ").substring(0, 19);
-};
+      return date.toISOString().replace("T", " ").substring(0, 19);
+    };
     /**
      * 🔥 TRACKING API
      */
- let trackingData;
+    let trackingData;
 
-try {
-  trackingData = await fetchTrackingData(
-    vehicleInfo.ts_id,
-    startTimeApi,
-    endTimeApi
-  );
-} catch (err: any) {
-  console.error("❌ TRACKING FAILED:", err.message);
+    try {
+      trackingData = await fetchTrackingData(
+        vehicleInfo.ts_id,
+        startTimeApi,
+        endTimeApi,
+      );
+    } catch (err: any) {
+      console.error("❌ TRACKING FAILED:", err.message);
 
-  return NextResponse.json(
-  { error: "TRACKING_FAILED" },
-  { status: 500 }
-);
-}
+      return NextResponse.json({ error: "TRACKING_FAILED" }, { status: 500 });
+    }
     const polyline = trackingData.polyline;
-    const visitedpoints = trackingData.visitedpoints  || [];
+    const visitedpoints = trackingData.visitedpoints || [];
     const totalLiftCount = trackingData.totalLiftCount;
 
     /**
@@ -234,17 +239,16 @@ try {
 
       const distanceMeters = calculateRouteDistance(decoded);
       formattedDistanceKm = parseFloat((distanceMeters / 1000).toFixed(2));
-      
     }
 
     /**
      * 📅 DATE
      */
-   const baseDate = parseArabicExcelDate(rawActivityData[0]["التاريخ"]);
+    const baseDate = parseArabicExcelDate(rawActivityData[0]["التاريخ"]);
 
-if (!baseDate || isNaN(baseDate.getTime())) {
-  throw new Error("Invalid baseDate");
-}
+    if (!baseDate || isNaN(baseDate.getTime())) {
+      throw new Error("Invalid baseDate");
+    }
 
     baseDate.setHours(0, 0, 0, 0);
 
@@ -262,11 +266,7 @@ if (!baseDate || isNaN(baseDate.getTime())) {
     if (!vehicleId) {
       const insV = await client.query(
         "INSERT INTO vehicles (plate, company, sub_fleet) VALUES ($1, $2, $3) RETURNING id",
-        [
-          plateNumber,
-          infoData[0]["المؤسسة"],
-          infoData[0]["المجموعة الفرعية"],
-        ]
+        [plateNumber, infoData[0]["المؤسسة"], infoData[0]["المجموعة الفرعية"]],
       );
       vehicleId = insV.rows[0].id;
     }
@@ -294,7 +294,7 @@ if (!baseDate || isNaN(baseDate.getTime())) {
         polyline,
         JSON.stringify(visitedpoints),
         formattedDistanceKm,
-      ]
+      ],
     );
 
     const summaryId = summaryInsert.rows[0].id;
@@ -306,7 +306,7 @@ if (!baseDate || isNaN(baseDate.getTime())) {
       const alertValues = alertsData.map((a) => [
         vehicleId,
         summaryId,
-toDbDate(a["التاريخ"]),
+        toDbDate(a["التاريخ"]),
         getUTS(a["التاريخ"]),
         a["التنبيه"],
         a["العنوان"],
@@ -319,8 +319,8 @@ toDbDate(a["التاريخ"]),
           `INSERT INTO vehicle_alerts 
           (vehicle_id, summary_id, alert_timestamp, alert_timestamp_uts, alert_type, address, longitude, latitude)
           VALUES %L`,
-          alertValues
-        )
+          alertValues,
+        ),
       );
     }
 
@@ -345,8 +345,8 @@ toDbDate(a["التاريخ"]),
           `INSERT INTO vehicle_activity_logs 
           (vehicle_id, summary_id, log_timestamp, log_timestamp_uts, is_engine_on, speed, address, longitude, latitude)
           VALUES %L`,
-          activityValues
-        )
+          activityValues,
+        ),
       );
     }
 
