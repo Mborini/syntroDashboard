@@ -1,7 +1,6 @@
 // app/tables/page.tsx
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { ExpensesInvoiceTable } from "@/components/ExpensesInvoice/Table";
-import { SalesItemsTable } from "@/components/BinsLocation/Table";
 
 export default async function SalesItemsPage() {
   return (
@@ -9,7 +8,7 @@ export default async function SalesItemsPage() {
       <Breadcrumb pageName="اصناف المبيعات" />
 
       <div className="space-y-10">
-        <SalesItemsTable />
+        
       </div>
     </>
   );
