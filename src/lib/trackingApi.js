@@ -1,16 +1,13 @@
-// trackingApi.js
-const axios = require("axios");
-const polyline = require("@mapbox/polyline");
+import axios from "axios";
 
-async function fetchTrackingFromGAM(tsId, from, to) {
-  const cookie = process.env.TrACKING_CoOKIES;
+async function fetchTrackingFromGAM(tsId, from, to, sessionValue) {
   try {
     const response = await axios.get(
       "https://gamtracking.amman.jo/Tracking/WasteMangement/Endpoints/ManageGarbageTrucksLive.ashx",
       {
         params: {
-          from: from,
-          to: to,
+          from,
+          to,
           SelectedVehicles: tsId,
           IsTrucks: "false",
         },
@@ -21,31 +18,32 @@ async function fetchTrackingFromGAM(tsId, from, to) {
           "X-Requested-With": "XMLHttpRequest",
           Referer:
             "https://gamtracking.amman.jo/Tracking/WasteMangement/MonitorBinsLiftPlaces/MonitorBinsLiftPlaces.aspx",
-          Cookie:cookie,
+          Cookie: sessionValue || "",
         },
       }
     );
-    
-    // ✅ polyline
-    const encodedPolyline = data.VehiclePolylines?.[0]?.Polyline;
 
-    // ✅ count lift
+    const data = response.data; // ✅ مهم جداً
+
+    const encodedPolyline = data.VehiclePolylines?.[0]?.Polyline;
     const totalLiftCount = data.TotalLiftCount;
-    // ✅ visited points
     const VisitedVehicles = data.VisitedVehicles || [];
 
-    // ✅ النتيجة النهائية
-    const result = {
+    return {
       polyline: encodedPolyline,
       totalLiftCount,
       visitedpoints: VisitedVehicles,
     };
-
-    return result;
   } catch (err) {
-    console.error("❌ Error:", err.response?.data || err.message);
-    return { polyline: null, totalLiftCount: 0, coordinates: [] };
+    console.error("❌ GAM ERROR:", err?.response?.status, err?.message);
+
+    return {
+      error: true,
+      status: err?.response?.status || 500,
+      polyline: null,
+      totalLiftCount: 0,
+      visitedpoints: [],
+    };
   }
 }
-
-module.exports = { fetchTrackingFromGAM };
+export { fetchTrackingFromGAM };

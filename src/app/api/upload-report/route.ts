@@ -121,7 +121,8 @@ async function getVehicleTsId(plate: string) {
 
 async function fetchTrackingData(tsId: string, from: string, to: string) {
   if (!tsId) return { polyline: null, totalLiftCount: 0, visitedpoints: [] };
-  return await fetchTrackingFromGAM(tsId, from, to);
+  const session = await getServerSession(authOptions);
+  return await fetchTrackingFromGAM(tsId, from, to, session?.sessionValue || null);
 }
 
 /**
@@ -201,10 +202,22 @@ const toDbDate = (d: any) => {
     /**
      * 🔥 TRACKING API
      */
-    const trackingData = vehicleInfo?.ts_id
-      ? await fetchTrackingData(vehicleInfo.ts_id, startTimeApi, endTimeApi)
-      : { polyline: null, totalLiftCount: 0, visitedpoints: [] };
+ let trackingData;
 
+try {
+  trackingData = await fetchTrackingData(
+    vehicleInfo.ts_id,
+    startTimeApi,
+    endTimeApi
+  );
+} catch (err: any) {
+  console.error("❌ TRACKING FAILED:", err.message);
+
+  return NextResponse.json(
+  { error: "TRACKING_FAILED" },
+  { status: 500 }
+);
+}
     const polyline = trackingData.polyline;
     const visitedpoints = trackingData.visitedpoints  || [];
     const totalLiftCount = trackingData.totalLiftCount;
@@ -423,7 +436,6 @@ LIMIT 50;
     `;
 
     const result = await client.query(query);
-    console.log(result.rows);
     return NextResponse.json(result.rows);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

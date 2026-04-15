@@ -24,7 +24,6 @@ export default function GeoJSONMapModal({ opened, onClose }: Props) {
     fetch("/api/binsLocations")
       .then((res) => res.json())
       .then((res) => {
-        console.log("DATA:", res);
         setData(res);
       });
   }, []);

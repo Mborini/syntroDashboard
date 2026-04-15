@@ -7,7 +7,7 @@ export async function GET(
 ) {
   try {
     const { reportId } = params;
-console.log("GET CHECKLIST REPORT ID:", reportId);
+
     const result = await pool.query(
       `
       SELECT *
@@ -17,7 +17,7 @@ console.log("GET CHECKLIST REPORT ID:", reportId);
       `,
       [reportId]
     );
-console.log("GET CHECKLIST RESULT:", result.rows);
+
     return NextResponse.json(result.rows[0] || null);
   } catch (error) {
     console.error("GET ERROR:", error);

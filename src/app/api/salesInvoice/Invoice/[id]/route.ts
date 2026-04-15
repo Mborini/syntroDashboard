@@ -7,12 +7,8 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   const client = await pool.connect();
 
   try {
-    console.log("🚀 Starting invoice update for ID:", invoiceId);
-
     await client.query("BEGIN");
 
-    // 🔹 تحديث بيانات الفاتورة
-    console.log("📌 Updating invoice info:", data);
     await client.query(
       `UPDATE sales_invoices 
        SET customer_id=$1, invoice_date=$2, grand_total=$3, status=$4, paid_amount=$5
@@ -36,7 +32,7 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
       item_id: i.item_id,
       qty: Number(i.qty),
     }));
-    console.log("📝 Old invoice items:", oldItems);
+ 
 
     // تحويلها إلى كائن للسهولة
     const oldItemsMap: Record<number, number> = {};

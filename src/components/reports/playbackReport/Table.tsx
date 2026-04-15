@@ -18,7 +18,10 @@ import {
   Badge,
   ActionIcon,
   Tooltip,
+  TextInput,
+  Modal,
 } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 import { Dropzone, FileWithPath, MIME_TYPES } from "@mantine/dropzone";
 import {
   deleteReportBySlug,
@@ -52,6 +55,8 @@ import { FaMapMarkedAlt } from "react-icons/fa";
 import PolylineMapModal from "./PolylineMapModal";
 import { GiPathDistance } from "react-icons/gi";
 import { exportReportPDF } from "@/app/utils/exportReportPDF";
+import { Toast } from "@/lib/toast";
+import { useSession } from "next-auth/react";
 type ReportData = {
   id: number;
   plateNumber: string;
@@ -79,6 +84,8 @@ type ReportData = {
 };
 
 export function PlaybackReportTable() {
+  const [sessionModalOpen, setSessionModalOpen] = useState(false);
+const [newSessionValue, setNewSessionValue] = useState("");
   const [checklists, setChecklists] = useState<Record<string, any>>({});
   const [selectedReport, setSelectedReport] = useState<ReportData | null>(null);
   const [reports, setReports] = useState<ReportData[]>([]);
@@ -109,21 +116,38 @@ export function PlaybackReportTable() {
   useEffect(() => {
     loadReports();
   }, []);
-  const handleUpload = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!selectedFile) return;
-    setUploading(true);
-    try {
-      await uploadReport(selectedFile);
-      setSelectedFile(null);
-      setDropStatus("idle");
-      loadReports(); // إعادة تحميل الجدول لعرض التقرير الجديد فوراً
-    } catch (err) {
-      console.error("Failed to upload report:", err);
-    } finally {
-      setUploading(false);
-    }
-  };
+const handleUpload = async (e: React.MouseEvent) => {
+  e.stopPropagation();
+  if (!selectedFile) return;
+
+  setUploading(true);
+
+  try {
+    await uploadReport(selectedFile);
+
+    notifications.show({
+      title: "نجاح",
+      message: "تم رفع التقرير بنجاح",
+      color: "green",
+    });
+
+    setSelectedFile(null);
+    setDropStatus("idle");
+    loadReports();
+  } catch (err: any) {
+  console.error("UPLOAD ERROR:", err || err.message);
+
+  Toast.error(
+    err?.response?.data?.error ||
+    "انتهت الجلسة, يرجى إعادة تسجيل الدخول"
+  );
+
+  // 🔥 افتح المودال
+  setSessionModalOpen(true);
+}finally {
+    setUploading(false);
+  }
+};
 
   // =========================
   // 📊 بيانات التقرير
@@ -172,7 +196,8 @@ export function PlaybackReportTable() {
 
     return String(time);
   };
-  console.log("🚀 reports:", reports);
+   const { update } = useSession();
+ 
   return (
     <>
       {/* منطقة الرفع */}
@@ -460,6 +485,39 @@ export function PlaybackReportTable() {
           }}
         />
       </ScrollArea>
+      <Modal
+  opened={sessionModalOpen}
+  onClose={() => setSessionModalOpen(false)}
+  centered
+  withCloseButton={false}
+>
+  <div className="space-y-4" dir="rtl">
+    <TextInput
+      label="تحديث الجلسة"
+      placeholder="أدخل القيمة الجديدة"
+      value={newSessionValue}
+      onChange={(e) => setNewSessionValue(e.currentTarget.value)}
+    />
+
+    <Button
+  fullWidth
+  disabled={!newSessionValue}
+  onClick={async () => {
+    await update({
+      sessionValue: newSessionValue,
+    });
+
+    setSessionModalOpen(false);
+    setNewSessionValue("");
+
+    // مهم جدًا
+    loadReports();
+  }}
+>
+  حفظ الجلسة
+</Button>
+  </div>
+</Modal>
     </>
   );
 }

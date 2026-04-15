@@ -7,6 +7,7 @@ import type { PropsWithChildren } from "react";
 import NextTopLoader from "nextjs-toploader";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "react-hot-toast";
+import { Notifications } from "@mantine/notifications";
 
 export default function RootLayout({ children }: PropsWithChildren) {
   return (
@@ -19,9 +20,11 @@ export default function RootLayout({ children }: PropsWithChildren) {
         >
           <NextTopLoader color="#5750F1" showSpinner={false} />
           <Providers>
+
             <main className="isolate mx-auto w-full overflow-hidden">
               {children}
             </main>
+                  
 
             <Toaster
             

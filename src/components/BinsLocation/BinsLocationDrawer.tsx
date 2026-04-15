@@ -43,7 +43,6 @@ export default function BinsLocationDrawer({
     async function loadVehicle() {
       try {
         const data = await getVehicles();
-        console.log("Vehicles loaded:", data);
         setVehicles(data);
       } catch (error) {
         console.error(error);
@@ -110,7 +109,6 @@ export default function BinsLocationDrawer({
       setLoading(false);
     }
   };
-  console.log("vehicles:", vehicles);
   return (
     <Drawer
       opened={opened}
