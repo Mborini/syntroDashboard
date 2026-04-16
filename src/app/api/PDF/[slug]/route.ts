@@ -23,6 +23,8 @@ export async function GET(
           vds.avg_speed AS "avgSpeed",
           vds.max_speed AS "maxSpeed",
           vds.total_lifts AS "totalLifts",
+          vds.start_date AS "firstTripTime",
+          vds.end_date AS "lastTripTime",
 
           COUNT(va.id) AS "totalAlerts",
 
@@ -74,6 +76,8 @@ export async function GET(
           vds.total_lifts,
           v.container_size,
           v.sub_fleet,
+          vds.start_date,
+          vds.end_date,
 
           rc.shift,
           rc.trips,

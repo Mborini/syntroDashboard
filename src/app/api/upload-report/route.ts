@@ -20,7 +20,18 @@ function getUTS(dateStr: any): number {
   const date = new Date(formatted);
   return isNaN(date.getTime()) ? 0 : Math.floor(date.getTime() / 1000);
 }
+function toTimeOnly(date: any) {
+  if (!date) return null;
 
+  const d = new Date(date);
+  if (isNaN(d.getTime())) return null;
+
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mm = String(d.getMinutes()).padStart(2, "0");
+  const ss = String(d.getSeconds()).padStart(2, "0");
+
+  return `${hh}:${mm}:${ss}`;
+}
 function formatArabicDateTime(dateStr: any) {
   if (!dateStr || typeof dateStr !== "string") return dateStr;
   let formatted = dateStr.replace("ص", "AM").replace("م", "PM");
@@ -120,6 +131,7 @@ async function getVehicleTsId(plate: string) {
 async function fetchTrackingData(tsId: string, from: string, to: string) {
   if (!tsId) return { polyline: null, totalLiftCount: 0, visitedpoints: [] };
   const session = await getServerSession(authOptions);
+  console.log("fetchTrackingData",session?.sessionValue)
   return await fetchTrackingFromGAM(
     tsId,
     from,
@@ -349,7 +361,34 @@ export async function POST(req: NextRequest) {
         ),
       );
     }
+const minMaxResult = await client.query(
+  `
+  SELECT 
+    MIN(log_timestamp) AS start_time,
+    MAX(log_timestamp) AS end_time
+  FROM vehicle_activity_logs
+  WHERE summary_id = $1
+  `,
+  [summaryId]
+);
+const startTimeRaw = minMaxResult.rows[0].start_time;
+const endTimeRaw = minMaxResult.rows[0].end_time;
 
+const startTime = toTimeOnly(startTimeRaw);
+const endTime = toTimeOnly(endTimeRaw);
+await client.query(
+  `
+  UPDATE vehicle_daily_summaries
+  SET start_date = $1,
+      end_date = $2
+  WHERE id = $3
+  `,
+  [
+    startTime,
+    endTime,
+    summaryId,
+  ]
+);
     await client.query("COMMIT");
 
     return NextResponse.json({

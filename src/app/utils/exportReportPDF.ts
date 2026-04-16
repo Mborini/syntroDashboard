@@ -33,7 +33,7 @@ export const exportReportPDF = async (reportId: any) => {
     const data = await res.json();
 
     if (!data) throw new Error("No data found");
-
+    console.log(data);
     const pdf = new jsPDF();
 
     const issueDate = new Date().toLocaleDateString("en-US");
@@ -67,17 +67,22 @@ export const exportReportPDF = async (reportId: any) => {
       head: [["Field", "Value"]],
       body: [
         ["Plate Number", data.plateNumber],
-        ["Aria", data.subFleet === "منطقة طارق" ? "Tariq Aria" : "-"],
+        ["Area", data.subFleet === "منطقة طارق" ? "Tariq Aria" : "-"],
         ["Shift", data.shift || "-"],
-        ["Container Size", `${data.containerSize} TN`],
+        ["Compactor Size", `${data.containerSize} TN`],
         ["Date", new Date(data.date).toLocaleDateString("en-US")],
-        ["Distance", `${data.distanceKm} KM`],
-        ["Driving Time", formatInterval(data.totalDriveTime)],
-        ["Stop Time", formatInterval(data.totalStopTime)],
-        ["Idle Time", formatInterval(data.totalIdleTime)],
+        [
+          "Departure time",
+          data.firstTripTime ? String(data.firstTripTime) : "-",
+        ],
+        ["Return time", data.lastTripTime ? String(data.lastTripTime) : "-"],
+        ["Total Distance", `${data.distanceKm} KM`],
+        ["Total Driving Time", formatInterval(data.totalDriveTime)],
+        ["Total Stop Time", formatInterval(data.totalStopTime)],
+        ["Total Idle Time", formatInterval(data.totalIdleTime)],
         ["Average Speed", `${data.avgSpeed} KM/H`],
         ["Max Speed", `${data.maxSpeed} KM/H`],
-        ["Total Loads", data.totalLifts],
+        ["Total Number Of container Collected", data.totalLifts],
         ["Total Speed Alerts", data.totalAlerts],
       ],
       theme: "striped",
@@ -109,7 +114,7 @@ export const exportReportPDF = async (reportId: any) => {
       startY: y,
       head: [["Evaluation", "Value"]],
       body: [
-        ["Trips Count", data.trips || "-"],
+        ["Total Trips", data.trips || "-"],
         ["Followed Route", data.followedRoute === "true" ? "Yes" : "No"],
         ["Route Compliance", data.completedRoute === "true" ? "Yes" : "No"],
         ["Deviated Route", data.hasDeviation === "true" ? "Yes" : "No"],
