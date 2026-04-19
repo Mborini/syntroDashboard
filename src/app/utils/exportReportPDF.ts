@@ -67,7 +67,7 @@ export const exportReportPDF = async (reportId: any) => {
       head: [["Field", "Value"]],
       body: [
         ["Plate Number", data.plateNumber],
-        ["Area", data.subFleet === "منطقة طارق" ? "Tariq Aria" : "-"],
+        ["Area", data.subFleet === "منطقة طارق" ? "Tariq Area" : "-"],
         ["Shift", data.shift || "-"],
         ["Compactor Size", `${data.containerSize} TN`],
         ["Date", new Date(data.date).toLocaleDateString("en-US")],

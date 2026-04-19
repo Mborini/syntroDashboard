@@ -131,7 +131,7 @@ async function getVehicleTsId(plate: string) {
 async function fetchTrackingData(tsId: string, from: string, to: string) {
   if (!tsId) return { polyline: null, totalLiftCount: 0, visitedpoints: [] };
   const session = await getServerSession(authOptions);
-  console.log("fetchTrackingData",session?.sessionValue)
+  console.log("fetchTrackingData", session?.sessionValue);
   return await fetchTrackingFromGAM(
     tsId,
     from,
@@ -361,34 +361,34 @@ export async function POST(req: NextRequest) {
         ),
       );
     }
-const minMaxResult = await client.query(
-  `
-  SELECT 
-    MIN(log_timestamp) AS start_time,
-    MAX(log_timestamp) AS end_time
-  FROM vehicle_activity_logs
-  WHERE summary_id = $1
-  `,
-  [summaryId]
-);
-const startTimeRaw = minMaxResult.rows[0].start_time;
-const endTimeRaw = minMaxResult.rows[0].end_time;
+    let minDate: Date | null = null;
+    let maxDate: Date | null = null;
 
-const startTime = toTimeOnly(startTimeRaw);
-const endTime = toTimeOnly(endTimeRaw);
-await client.query(
-  `
+    for (const row of rawActivityData) {
+      const parsedDate = parseArabicExcelDate(row["التاريخ"]);
+
+      if (!parsedDate || isNaN(parsedDate.getTime())) continue;
+
+      if (!minDate || parsedDate < minDate) {
+        minDate = parsedDate;
+      }
+
+      if (!maxDate || parsedDate > maxDate) {
+        maxDate = parsedDate;
+      }
+    }
+    const startTime = toTimeOnly(minDate);
+    const endTime = toTimeOnly(maxDate);
+
+    await client.query(
+      `
   UPDATE vehicle_daily_summaries
   SET start_date = $1,
       end_date = $2
   WHERE id = $3
   `,
-  [
-    startTime,
-    endTime,
-    summaryId,
-  ]
-);
+      [startTime, endTime, summaryId],
+    );
     await client.query("COMMIT");
 
     return NextResponse.json({

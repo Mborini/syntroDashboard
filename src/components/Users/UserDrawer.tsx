@@ -98,14 +98,14 @@ export function UserDrawer({
           }
         />
 
-        <Select
+        {/* <Select
           radius={"md"}
           label="Role"
           placeholder="Select role"
           value={form.role_id?.toString()}
           onChange={(val) => setForm({ ...form, role_id: Number(val) })}
           data={roles.map((r) => ({ value: r.id.toString(), label: r.name }))}
-        />
+        /> */}
 
         {!user && (
           <TextInput
