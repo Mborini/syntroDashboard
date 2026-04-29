@@ -85,7 +85,7 @@ type ReportData = {
 
 export function PlaybackReportTable() {
   const [sessionModalOpen, setSessionModalOpen] = useState(false);
-const [newSessionValue, setNewSessionValue] = useState("");
+  const [newSessionValue, setNewSessionValue] = useState("");
   const [checklists, setChecklists] = useState<Record<string, any>>({});
   const [selectedReport, setSelectedReport] = useState<ReportData | null>(null);
   const [reports, setReports] = useState<ReportData[]>([]);
@@ -116,38 +116,52 @@ const [newSessionValue, setNewSessionValue] = useState("");
   useEffect(() => {
     loadReports();
   }, []);
-const handleUpload = async (e: React.MouseEvent) => {
-  e.stopPropagation();
-  if (!selectedFile) return;
+  const handleUpload = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!selectedFile) return;
 
-  setUploading(true);
+    setUploading(true);
 
-  try {
-    await uploadReport(selectedFile);
+    try {
+      await uploadReport(selectedFile);
 
-    notifications.show({
-      title: "نجاح",
-      message: "تم رفع التقرير بنجاح",
-      color: "green",
-    });
+      notifications.show({
+        title: "نجاح",
+        message: "تم رفع التقرير بنجاح",
+        color: "green",
+      });
 
-    setSelectedFile(null);
-    setDropStatus("idle");
-    loadReports();
-  } catch (err: any) {
-  console.error("UPLOAD ERROR:", err || err.message);
+      setSelectedFile(null);
+      setDropStatus("idle");
+      loadReports();
+    } catch (err: any) {
+      console.error("UPLOAD ERROR:", err || err.message);
 
-  Toast.error(
-    err?.response?.data?.error ||
-    "انتهت الجلسة, يرجى إعادة تسجيل الدخول"
-  );
+      Toast.error(
+        err?.response?.data?.error || "انتهت الجلسة, يرجى إعادة تسجيل الدخول",
+      );
 
-  // 🔥 افتح المودال
-  setSessionModalOpen(true);
-}finally {
-    setUploading(false);
+      // 🔥 افتح المودال
+      setSessionModalOpen(true);
+    } finally {
+      setUploading(false);
+    }
+  };
+  function formatSecondsToTime(seconds: number | null | undefined) {
+    if (!seconds || seconds <= 0) return "00:00:00";
+
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = Math.floor(seconds % 60);
+
+    return (
+      String(h).padStart(2, "0") +
+      ":" +
+      String(m).padStart(2, "0") +
+      ":" +
+      String(s).padStart(2, "0")
+    );
   }
-};
 
   // =========================
   // 📊 بيانات التقرير
@@ -196,8 +210,8 @@ const handleUpload = async (e: React.MouseEvent) => {
 
     return String(time);
   };
-   const { update } = useSession();
- 
+  const { update } = useSession();
+
   return (
     <>
       {/* منطقة الرفع */}
@@ -302,6 +316,12 @@ const handleUpload = async (e: React.MouseEvent) => {
               <Table.Th style={{ textAlign: "center" }}>وقت الخمول</Table.Th>
               <Table.Th style={{ textAlign: "center" }}>وقت التوقف</Table.Th>
               <Table.Th style={{ textAlign: "center" }}>متوسط السرعة</Table.Th>
+              <Table.Th style={{ textAlign: "center" }}> وقت الانطلاق</Table.Th>
+              <Table.Th style={{ textAlign: "center" }}> وقت العودة </Table.Th>
+              <Table.Th style={{ textAlign: "center" }}>
+                وقت العمل الفعلي
+              </Table.Th>
+
               <Table.Th style={{ textAlign: "center" }}>أقصى سرعة</Table.Th>
               <Table.Th style={{ textAlign: "center" }}>عدد الرفع</Table.Th>
               <Table.Th style={{ textAlign: "center" }}> المسار</Table.Th>
@@ -386,7 +406,23 @@ const handleUpload = async (e: React.MouseEvent) => {
                       <Text dir="ltr">{formatInterval(report.avgSpeed)}</Text>
                     </Group>
                   </Table.Td>
-
+                  <Table.Td>
+                    <Group gap="xs" justify="center">
+                      <Text dir="ltr">{report.startDate}</Text>
+                    </Group>{" "}
+                  </Table.Td>{" "}
+                  <Table.Td>
+                    <Group gap="xs" justify="center">
+                      <Text dir="ltr">{report.endDate}</Text>
+                    </Group>
+                  </Table.Td>
+                  <Table.Td>
+                    <Group gap="xs" justify="center">
+                      <Text dir="ltr">
+                        {formatSecondsToTime(report.fullWorkTimeSeconds)}
+                      </Text>
+                    </Group>
+                  </Table.Td>
                   <Table.Td>
                     <Group gap="xs" justify="center">
                       <RiSpeedUpFill size={18} />
@@ -423,7 +459,10 @@ const handleUpload = async (e: React.MouseEvent) => {
                         <div>
                           {report.alerts?.map((a, i) => (
                             <div key={i} style={{ fontSize: 12 }}>
-                              {i + 1} | time: {new Date(a.alertTime).toLocaleString("ar-EG")} | location: {a.address}| speed: {a.speed} km/h| type: {a.alertType}
+                              {i + 1} | time:{" "}
+                              {new Date(a.alertTime).toLocaleString("ar-EG")} |
+                              location: {a.address}| speed: {a.speed} km/h|
+                              type: {a.alertType}
                             </div>
                           ))}
                         </div>
@@ -431,7 +470,6 @@ const handleUpload = async (e: React.MouseEvent) => {
                       withArrow
                       position="top"
                       multiline
-                     
                     >
                       <Badge
                         variant="light"
@@ -447,11 +485,7 @@ const handleUpload = async (e: React.MouseEvent) => {
                       variant="subtle"
                       color="green"
                       disabled={!report.isRated}
-                      onClick={() =>
-                        exportReportPDF(
-                          report.id,
-                        )
-                      }
+                      onClick={() => exportReportPDF(report.id)}
                     >
                       <FaFilePdf size={18} />
                     </ActionIcon>
@@ -486,38 +520,38 @@ const handleUpload = async (e: React.MouseEvent) => {
         />
       </ScrollArea>
       <Modal
-  opened={sessionModalOpen}
-  onClose={() => setSessionModalOpen(false)}
-  centered
-  withCloseButton={false}
->
-  <div className="space-y-4" dir="rtl">
-    <TextInput
-      label="تحديث الجلسة"
-      placeholder="أدخل القيمة الجديدة"
-      value={newSessionValue}
-      onChange={(e) => setNewSessionValue(e.currentTarget.value)}
-    />
+        opened={sessionModalOpen}
+        onClose={() => setSessionModalOpen(false)}
+        centered
+        withCloseButton={false}
+      >
+        <div className="space-y-4" dir="rtl">
+          <TextInput
+            label="تحديث الجلسة"
+            placeholder="أدخل القيمة الجديدة"
+            value={newSessionValue}
+            onChange={(e) => setNewSessionValue(e.currentTarget.value)}
+          />
 
-    <Button
-  fullWidth
-  disabled={!newSessionValue}
-  onClick={async () => {
-    await update({
-      sessionValue: newSessionValue,
-    });
+          <Button
+            fullWidth
+            disabled={!newSessionValue}
+            onClick={async () => {
+              await update({
+                sessionValue: newSessionValue,
+              });
 
-    setSessionModalOpen(false);
-    setNewSessionValue("");
+              setSessionModalOpen(false);
+              setNewSessionValue("");
 
-    // مهم جدًا
-    loadReports();
-  }}
->
-  حفظ الجلسة
-</Button>
-  </div>
-</Modal>
+              // مهم جدًا
+              loadReports();
+            }}
+          >
+            حفظ الجلسة
+          </Button>
+        </div>
+      </Modal>
     </>
   );
 }

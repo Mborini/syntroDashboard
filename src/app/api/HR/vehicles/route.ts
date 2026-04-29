@@ -7,21 +7,11 @@ import { authOptions } from "@/lib/authOptions";
 export async function GET() {
   const session = await getServerSession(authOptions);
 
-  if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
   try {
     const headers = new Headers({
       Accept: "application/json",
+      Cookie: "ADC_CONN_539B3595F4E=7DEA341F90062C0070BA2E073C408F511B70085238B3F50F7D53BC5AC3D2BEFE58F25C6A6E3CC269; ASP.NET_SessionId=5jzrnxqvw4nzb1fpjfwgtmuw; ADC_REQ_2E94AF76E7=152E8C04A21B76A56BEF905E1598F32C10225A6DB90CD79947A298B06C9F4A28D62D1842FC5B19C7"
     });
-
-    if (session.sessionValue) {
-      //find ASP.NET_SessionId 
-      const match = session.sessionValue.match(/ASP\.NET_SessionId=[^;]+/);
-      if (match) {
-        headers.set("cookie", match[0]);
-      }
-    }
 
     const response = await fetch(
       "https://gamtracking.amman.jo/tracking/Settings/Vehicles/VehiclesHandler.ashx",
@@ -60,5 +50,3 @@ export async function GET() {
     );
   }
 }
-
-

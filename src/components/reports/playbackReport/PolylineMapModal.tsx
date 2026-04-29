@@ -12,6 +12,7 @@ import polyline from "@mapbox/polyline";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { getBinsLocationsByPlate } from "@/services/binsLocationServices";
 import ReportChecklist from "@/components/ReportChecklist/ReportChecklist";
+import MapScreenshotButton from "./MapScreenshotButton";
 
 type Props = {
   opened: boolean;
@@ -50,23 +51,25 @@ const PolylineMapModal = forwardRef(function PolylineMapModal(
     [],
   );
   const [selectedBinRegions, setSelectedBinRegions] = useState<number[]>([]);
-
+  const apiRef = useRef<any>(null);
   const [showVisited, setShowVisited] = useState(true);
 
   const visitedMarkersRef = useRef<any[]>([]);
   const [mapReady, setMapReady] = useState(false);
   // Expose getMap method to parent component
-  useImperativeHandle(ref, () => ({
-    getMap: () => mapRef.current,
+  useImperativeHandle(ref, () => apiRef.current);
 
-    getMapImage: () => {
-      const map = mapRef.current;
-      if (!map) return null;
+  useEffect(() => {
+    apiRef.current = {
+      getMapImage: () => {
+        if (!mapReady || !mapRef.current) return null;
 
-      return map.getCanvas().toDataURL("image/png");
-    },
-  }));
-
+        mapRef.current.triggerRepaint(); // ✅ تأكد الإطار مرسوم
+        return mapRef.current.getCanvas().toDataURL("image/png");
+      },
+    };
+  }, [mapReady]);
+  ``;
   // -----------------------------
   // RESET عند تغيير المركبة
   // -----------------------------
@@ -115,7 +118,48 @@ const PolylineMapModal = forwardRef(function PolylineMapModal(
 
     initializedLayersRef.current = true;
   }, [layers]);
+  const getMostVisitedBounds = (mapboxgl: any) => {
+    const precision = 50; // مستوى التجميع (≈ 10–15 متر)
 
+    const buckets = new Map<
+      string,
+      { count: number; points: [number, number][] }
+    >();
+
+    visitedPoints.forEach((p: any) => {
+      if (
+        p?.Longitude == null ||
+        p?.Latitude == null ||
+        isNaN(Number(p.Longitude)) ||
+        isNaN(Number(p.Latitude))
+      )
+        return;
+
+      const lng = Number(p.Longitude);
+      const lat = Number(p.Latitude);
+
+      const key = `${lng.toFixed(precision)},${lat.toFixed(precision)}`;
+
+      if (!buckets.has(key)) {
+        buckets.set(key, { count: 0, points: [] });
+      }
+
+      buckets.get(key)!.count++;
+      buckets.get(key)!.points.push([lng, lat]);
+    });
+
+    if (!buckets.size) return null;
+
+    // ✅ أكثر مكان تكراراً
+    const hotSpot = [...buckets.values()].sort((a, b) => b.count - a.count)[0];
+
+    const mapBounds = hotSpot.points.reduce(
+      (b: any, coord) => b.extend(coord),
+      new mapboxgl.LngLatBounds(hotSpot.points[0], hotSpot.points[0]),
+    );
+
+    return mapBounds;
+  };
   // -----------------------------
   // INIT MAP
   // -----------------------------
@@ -128,6 +172,17 @@ const PolylineMapModal = forwardRef(function PolylineMapModal(
       if (!containerRef.current || !encodedPolyline) return;
 
       const mapboxgl = (await import("mapbox-gl")).default;
+
+      // ✅ حل مشكلة انعكاس اللغة العربية داخل Mapbox
+      if (!(mapboxgl as any)._rtlTextPluginInitialized) {
+        mapboxgl.setRTLTextPlugin(
+          "https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-rtl-text/v0.2.3/mapbox-gl-rtl-text.js",
+          null,
+          true,
+        );
+        (mapboxgl as any)._rtlTextPluginInitialized = true;
+      }
+
       mapboxRef.current = mapboxgl;
 
       mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
@@ -141,8 +196,9 @@ const PolylineMapModal = forwardRef(function PolylineMapModal(
       const map = new mapboxgl.Map({
         container: containerRef.current,
         style: "mapbox://styles/mapbox/streets-v11",
-        center: decoded[0] as [number, number],
+        center: decoded[0],
         zoom: 12,
+        preserveDrawingBuffer: true, // ✅ مهم جداً
       });
 
       mapRef.current = map;
@@ -177,7 +233,20 @@ const PolylineMapModal = forwardRef(function PolylineMapModal(
           new mapboxgl.LngLatBounds(decoded[0], decoded[0]),
         );
 
-        map.fitBounds(bounds, { padding: 50 });
+        // ✅ FIT BASED ON VISITED POINTS (DEFAULT)
+        // ✅ DEFAULT FOCUS: MOST VISITED AREA (HOTSPOT)
+        const hotSpotBounds = getMostVisitedBounds(mapboxgl);
+
+        if (hotSpotBounds) {
+          map.fitBounds(hotSpotBounds, {
+            padding: 100,
+            maxZoom: 14,
+            duration: 800,
+          });
+        } else {
+          // fallback → المسار الكامل
+          map.fitBounds(bounds, { padding: 50 });
+        }
 
         // START / END
         new mapboxgl.Marker({ color: "green" })
@@ -350,36 +419,86 @@ const PolylineMapModal = forwardRef(function PolylineMapModal(
   const [saving, setSaving] = useState(false);
 
   const saveChecklist = async () => {
+    if (!mapRef.current) return;
+
     try {
       setSaving(true);
 
-      const payload = {
+      // ✅ 1. تصوير الخريطة
+      const imageBase64 = apiRef.current?.getMapImage();
+      if (!imageBase64) throw new Error("No image from map");
+
+      // ✅ 2. رفع الصورة على Cloudinary
+      const uploadRes = await fetch("/api/upload-map", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          image: imageBase64,
+          plateNumber,
+        }),
+      });
+      console.log("UPLOAD RESPONSE:", uploadRes);
+      if (!uploadRes.ok) {
+        const errorText = await uploadRes.text();
+        console.error("UPLOAD FAILED:", errorText);
+        throw new Error("Upload failed");
+      }
+
+      const uploaded = await uploadRes.json();
+      console.log("Cloudinary Uploaded:", uploaded);
+
+      if (!uploaded.url || !uploaded.public_id) {
+        throw new Error("Cloudinary did not return valid data");
+      }
+
+      // ✅ 3. استبعاد أي قيم ممكن تخرب الصورة من checklistData
+      const {
+        mapImageUrl: _ignore1,
+        mapImagePublicId: _ignore2,
+        ...safeChecklistData
+      } = checklistData || {};
+
+      // ✅ 4. إرسال البيانات مع رابط الصورة
+
+      const payload: any = {
         reportId: selectedReport?.id,
         plateNumber,
         date: new Date().toISOString(),
-        ...checklistData,
+
+        ...(checklistData || {}),
       };
 
+      // ✅ امسح أي قيم جاية من الفورم
+      delete payload.mapImageUrl;
+      delete payload.mapImagePublicId;
+
+      // ✅ أضف القيم الصح من Cloudinary
+      payload.mapImageUrl = uploaded.url;
+      payload.mapImagePublicId = uploaded.public_id;
+
+      // ✅ 5. حفظ التقرير
       const res = await fetch("/api/report-checklist", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+      console.log("body sent to /api/report-checklist:", payload);
+      if (!res.ok) {
+        const errText = await res.text();
+        console.error("SAVE FAILED:", errText);
+        throw new Error("Checklist save failed");
+      }
 
-      if (!res.ok) throw new Error("Failed");
       onSaved?.();
       onClose();
-
-      // ✅ 2. اعمل refresh للجدول
     } catch (err) {
-      console.error(err);
+      console.error("SAVE ERROR:", err);
       alert("فشل حفظ التقييم");
     } finally {
       setSaving(false);
     }
   };
+
   // -----------------------------
   // UI
   // -----------------------------

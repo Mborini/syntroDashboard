@@ -43,10 +43,8 @@ const parseArabicExcelDate = (value: string) => {
 
   let v = value.trim();
 
-  // تحويل ص / م إلى AM/PM
   v = v.replace("ص", "AM").replace("م", "PM");
 
-  // تحويل / إلى - (اختياري لتحسين parsing)
   const match = v.match(
     /(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2}):(\d{2})\s*(AM|PM)?/i,
   );
@@ -139,7 +137,22 @@ async function fetchTrackingData(tsId: string, from: string, to: string) {
     session?.sessionValue || null,
   );
 }
+function calculateFullWorkSeconds(rawActivityData: any[]) {
+  let minDate: Date | null = null;
+  let maxDate: Date | null = null;
 
+  for (const row of rawActivityData) {
+    const d = parseArabicExcelDate(row["التاريخ"]);
+    if (!d || isNaN(d.getTime())) continue;
+
+    if (!minDate || d < minDate) minDate = d;
+    if (!maxDate || d > maxDate) maxDate = d;
+  }
+
+  if (!minDate || !maxDate) return 0;
+
+  return Math.floor((maxDate.getTime() - minDate.getTime()) / 1000);
+}
 /**
  * =========================
  * POST
@@ -183,7 +196,12 @@ export async function POST(req: NextRequest) {
      */
     let startTimeApi = "";
     let endTimeApi = "";
-
+    function toEnglishDate(date: Date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, "0");
+      const d = String(date.getDate()).padStart(2, "0");
+      return `${y}-${m}-${d}`;
+    }
     if (rawActivityData.length > 0) {
       const firstDateTime = parseArabicExcelDate(rawActivityData[0]["التاريخ"]);
 
@@ -210,6 +228,12 @@ export async function POST(req: NextRequest) {
     } else {
       throw new Error("No activity data found in uploaded report");
     }
+    const fullWorkSeconds = calculateFullWorkSeconds(rawActivityData);
+    const fullWorkHours = Math.floor(fullWorkSeconds / 3600);
+    const fullWorkMinutes = Math.floor((fullWorkSeconds % 3600) / 60);
+
+    const fullWorkTimeText = `${fullWorkHours} ساعة ${fullWorkMinutes} دقيقة`;
+
     const toDbDate = (d: any) => {
       if (!d) return null;
 
@@ -264,8 +288,11 @@ export async function POST(req: NextRequest) {
 
     baseDate.setHours(0, 0, 0, 0);
 
+    // ✅ Unix timestamp (اتركه مثل ما هو)
     const reportDateUts = Math.floor(baseDate.getTime() / 1000);
-    const reportActualDate = baseDate.toISOString().split("T")[0];
+
+    // ✅ تاريخ إنجليزي بدون نقص يوم
+    const reportActualDate = toEnglishDate(baseDate);
 
     client = await pool.connect();
     await client.query("BEGIN");
@@ -288,10 +315,28 @@ export async function POST(req: NextRequest) {
      */
     const summaryInsert = await client.query(
       `
-      INSERT INTO vehicle_daily_summaries 
-      (vehicle_id, report_date, report_date_uts, driving_time, idle_time, stop_time, avg_speed, max_speed, total_lifts, polyline, visitedpoints, distance_km)
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
-      RETURNING id
+     INSERT INTO vehicle_daily_summaries
+(
+  vehicle_id,
+  report_date,
+  report_date_uts,
+  driving_time,
+  idle_time,
+  stop_time,
+  avg_speed,
+  max_speed,
+  total_lifts,
+  polyline,
+  visitedpoints,
+  distance_km,
+  full_work_time_seconds
+)
+VALUES
+(
+  $1, $2, $3, $4, $5, $6,
+  $7, $8, $9, $10, $11, $12, $13
+)
+RETURNING id;
       `,
       [
         vehicleId,
@@ -306,6 +351,7 @@ export async function POST(req: NextRequest) {
         polyline,
         JSON.stringify(visitedpoints),
         formattedDistanceKm,
+        fullWorkSeconds,
       ],
     );
 
@@ -436,6 +482,9 @@ export async function GET(req: NextRequest) {
     s.polyline AS "polyline",
     s.visitedpoints AS "visitedpoints",
     s.distance_km AS "distanceKm",
+s.full_work_time_seconds AS "fullWorkTimeSeconds",
+s.start_date AS "startDate",
+s.end_date AS "endDate",
 
     -- عدد التنبيهات
     (
@@ -470,7 +519,7 @@ export async function GET(req: NextRequest) {
 FROM vehicles v
 JOIN vehicle_daily_summaries s ON v.id = s.vehicle_id
 ORDER BY s.id DESC
-LIMIT 50;
+
 
     `;
 

@@ -4,8 +4,7 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) {
   const client = await pool.connect();
 
-  const clean = (v: any) =>
-    v === "" || v === undefined ? null : v;
+  const clean = (v: any) => (v === "" || v === undefined ? null : v);
 
   try {
     const body = await req.json();
@@ -32,7 +31,11 @@ export async function POST(req: Request) {
       locationOutsideArea,
       uncollectedBinsApproxCount,
       uncollectedBinsReason,
+
+      mapImageUrl, // ✅ أضف هذا
+      mapImagePublicId, // ✅ أضف هذا
     } = body;
+    console.log("mapImageUrl:", mapImageUrl);
 
     await client.query("BEGIN");
 
@@ -59,9 +62,11 @@ export async function POST(req: Request) {
         outside_area_reason,
         location_outside_area,
         uncollected_bins_approx_count,
-        uncollected_bins_reason
+        uncollected_bins_reason,
+        map_image_url,
+        map_image_public_id
       )
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21)
       ON CONFLICT (report_id)
       DO UPDATE SET
         plate_number = EXCLUDED.plate_number,
@@ -84,10 +89,13 @@ export async function POST(req: Request) {
         outside_area_reason = EXCLUDED.outside_area_reason,
         location_outside_area = EXCLUDED.location_outside_area,
         uncollected_bins_approx_count = EXCLUDED.uncollected_bins_approx_count,
-        uncollected_bins_reason = EXCLUDED.uncollected_bins_reason
+        uncollected_bins_reason = EXCLUDED.uncollected_bins_reason,
+        
+  map_image_url = EXCLUDED.map_image_url,            -- ✅ مهم
+  map_image_public_id = EXCLUDED.map_image_public_id -- ✅ مهم
+
       RETURNING *;
     `;
-
     const values = [
       reportId,
       plateNumber,
@@ -111,6 +119,9 @@ export async function POST(req: Request) {
       clean(locationOutsideArea),
       clean(uncollectedBinsApproxCount),
       clean(uncollectedBinsReason),
+
+      mapImageUrl, // ✅ رقم 20
+      mapImagePublicId, // ✅ رقم 21
     ];
 
     const result = await client.query(query, values);

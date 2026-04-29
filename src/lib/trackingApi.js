@@ -19,9 +19,10 @@ async function fetchTrackingFromGAM(tsId, from, to, sessionValue) {
           "X-Requested-With": "XMLHttpRequest",
           Referer:
             "https://gamtracking.amman.jo/Tracking/WasteMangement/MonitorBinsLiftPlaces/MonitorBinsLiftPlaces.aspx",
-          Cookie:"ADC_CONN_539B3595F4E=D5F1836B52B7EE7D06D94FC513CA160FB292F31489D0F3CB174790409212C0509D993AB4948A312A; ASP.NET_SessionId=ngawyjutn4g2fvqnkzyvsbf4; ADC_REQ_2E94AF76E7=6156A76D3DAAB4D80C9E9EDDD64C513F4F3B8C284403BE07F0D33F0C523FE26FC2CA4792F0B6C428"
+          Cookie:
+"ADC_CONN_539B3595F4E=1AD7C076310F260C57E6E839FECA86FA5810B8619C3EFCC6373AA5E9192961F1B4093D77E647F07D; ASP.NET_SessionId=5jzrnxqvw4nzb1fpjfwgtmuw; ADC_REQ_2E94AF76E7=BC7113FF03127CA92ABE9A44FEED968CF80339084A1A10DB75457DF46FE886D54DA6DEDABF22678C"
         },
-      }
+      },
     );
 
     const data = response.data; // ✅ مهم جداً

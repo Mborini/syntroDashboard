@@ -25,6 +25,7 @@ export async function GET(
           vds.total_lifts AS "totalLifts",
           vds.start_date AS "firstTripTime",
           vds.end_date AS "lastTripTime",
+          vds.full_work_time_seconds AS "fullWorkTimeSeconds",
 
           COUNT(va.id) AS "totalAlerts",
 
@@ -50,8 +51,8 @@ export async function GET(
           rc.deviation_reason AS "deviationReason",
           rc.outside_area_reason AS "outsideAreaReason",
           rc.location_outside_area AS "locationOutsideArea",
-          rc.uncollected_bins_reason AS "uncollectedBinsReason"
-
+          rc.uncollected_bins_reason AS "uncollectedBinsReason",
+          rc.map_image_url AS "mapImageUrl"
       FROM report_checklist rc
       LEFT JOIN vehicle_daily_summaries vds 
           ON rc.report_id = vds.id
@@ -78,7 +79,8 @@ export async function GET(
           v.sub_fleet,
           vds.start_date,
           vds.end_date,
-
+          vds.full_work_time_seconds,
+          rc.map_image_url,
           rc.shift,
           rc.trips,
           rc.followed_route,
