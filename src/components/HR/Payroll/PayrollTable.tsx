@@ -17,7 +17,6 @@ import ConfirmModal from "@/components/Common/ConfirmModal";
 import { TableSkeleton } from "@/components/Common/skeleton";
 import { FaRegMoneyBillAlt } from "react-icons/fa";
 import { deletePayroll, getPayrolls } from "@/services/payrollServices";
-import { getEmployees } from "@/services/employeeServices";
 import { Payroll } from "@/types/payroll";
 import { PayrollQueryDrawer } from "./LeaveDrawer";
 
@@ -57,19 +56,19 @@ export function PayrollTable() {
   };
 
   // ✅ تحميل الموظفين
-  const loadEmployees = async () => {
-    try {
-      const data = await getEmployees();
-      setEmployees(data.map((e) => ({ value: e.name, label: e.name })));
-    } catch (error) {
-      console.error("Failed to fetch employees:", error);
-    }
-  };
+  // const loadEmployees = async () => {
+  //   try {
+  //     const data = await getEmployees();
+  //     setEmployees(data.map((e) => ({ value: e.name, label: e.name })));
+  //   } catch (error) {
+  //     console.error("Failed to fetch employees:", error);
+  //   }
+  // };
 
-  useEffect(() => {
-    loadPayrolls();
-    loadEmployees();
-  }, []);
+  // useEffect(() => {
+  //   loadPayrolls();
+  //   loadEmployees();
+  // }, []);
 
   // ✅ فلترة عند تغيير الموظف أو الشهر
   useEffect(() => {
