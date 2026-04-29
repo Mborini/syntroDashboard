@@ -1,4 +1,4 @@
-import { AuthOptions } from "next-auth";
+import type { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import pool from "@/lib/db";
 
@@ -9,24 +9,33 @@ export const authOptions: AuthOptions = {
       credentials: {
         username: { label: "Username", type: "text" },
         password: { label: "Password", type: "password" },
+        sessionValue: { label: "Session", type: "text" },
       },
+
       async authorize(credentials) {
         const client = await pool.connect();
+
         try {
-          const query = `
+          const result = await client.query(
+            `
             SELECT u.id, u.username, u.password, r.name as role
             FROM users u
             JOIN roles r ON u.role_id = r.id
             WHERE u.username = $1
-          `;
-          const result = await client.query(query, [credentials?.username]);
+            `,
+            [credentials?.username]
+          );
+
           if (result.rows.length === 0) return null;
+
           const user = result.rows[0];
           if (credentials?.password !== user.password) return null;
+
           return {
             id: user.id,
             username: user.username,
             role: user.role,
+            sessionValue: credentials?.sessionValue, // ✅
           } as any;
         } finally {
           client.release();
@@ -34,36 +43,36 @@ export const authOptions: AuthOptions = {
       },
     }),
   ],
-  session: { strategy: "jwt" },
+
+  session: {
+    strategy: "jwt",
+  },
+
   callbacks: {
-  async jwt({ token, user, trigger, session }) {
-    // أول تسجيل دخول
-    if (user) {
-      token.id = (user as any).id;
-      token.username = (user as any).username;
-      token.role = (user as any).role;
-    
-    }
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = (user as any).id;
+        token.username = (user as any).username;
+        token.role = (user as any).role;
+        token.sessionValue = (user as any).sessionValue; // ✅
+      }
+      return token;
+    },
 
-    // 🔥 التحديث من الفرونت
-    if (trigger === "update" && session?.sessionValue) {
-      token.sessionValue = session.sessionValue;
-    }
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string;
+        session.user.username = token.username as string;
+        session.user.role = token.role as string;
+      }
 
-    return token;
+      (session as any).sessionValue = token.sessionValue;
+
+      console.log(
+        "Session value in session callback:",
+        token.sessionValue
+      ); // ✅ ستكون موجودة
+      return session;
+    },
   },
-
-  async session({ session, token }) {
-    if (session.user) {
-      session.user.id = token.id as string;
-      session.user.username = token.username as string;
-      session.user.role = token.role as string;
-    }
-
-    // 🔥 نرجّع sessionValue للفرونت
-    (session as any).sessionValue = token.sessionValue;
-
-    return session;
-  },
-}
 };

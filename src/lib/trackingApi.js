@@ -1,7 +1,7 @@
 import axios from "axios";
 
 async function fetchTrackingFromGAM(tsId, from, to, sessionValue) {
-  console.log("COOKIE =>", sessionValue);
+  
   try {
     const response = await axios.get(
       "https://gamtracking.amman.jo/Tracking/WasteMangement/Endpoints/ManageGarbageTrucksLive.ashx",
@@ -19,8 +19,7 @@ async function fetchTrackingFromGAM(tsId, from, to, sessionValue) {
           "X-Requested-With": "XMLHttpRequest",
           Referer:
             "https://gamtracking.amman.jo/Tracking/WasteMangement/MonitorBinsLiftPlaces/MonitorBinsLiftPlaces.aspx",
-          Cookie:
-"ADC_CONN_539B3595F4E=1AD7C076310F260C57E6E839FECA86FA5810B8619C3EFCC6373AA5E9192961F1B4093D77E647F07D; ASP.NET_SessionId=5jzrnxqvw4nzb1fpjfwgtmuw; ADC_REQ_2E94AF76E7=BC7113FF03127CA92ABE9A44FEED968CF80339084A1A10DB75457DF46FE886D54DA6DEDABF22678C"
+          Cookie: sessionValue,
         },
       },
     );

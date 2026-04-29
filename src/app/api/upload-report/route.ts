@@ -129,7 +129,6 @@ async function getVehicleTsId(plate: string) {
 async function fetchTrackingData(tsId: string, from: string, to: string) {
   if (!tsId) return { polyline: null, totalLiftCount: 0, visitedpoints: [] };
   const session = await getServerSession(authOptions);
-  console.log("fetchTrackingData", session?.sessionValue);
   return await fetchTrackingFromGAM(
     tsId,
     from,
