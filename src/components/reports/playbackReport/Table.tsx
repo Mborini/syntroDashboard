@@ -74,6 +74,9 @@ type ReportData = {
   visitedpoints: any[]; // تأكد من نوع البيانات الفعلي لهذا الحقل
   distanceKm: number;
   isRated: boolean;
+  startDate: string;
+  endDate: string;
+  fullWorkTimeSeconds: number;
   alerts: {
     alertTime: string;
     alertType: string;

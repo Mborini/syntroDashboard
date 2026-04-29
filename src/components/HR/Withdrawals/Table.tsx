@@ -19,7 +19,6 @@ import { WithdrawalDrawer } from "./WithdrawalDrawer";
 
 import { TbCashRegister } from "react-icons/tb";
 import { TableSkeleton } from "@/components/Common/skeleton";
-import { WithdrawalFilter, WithdrawalFilterDTO } from "./WithdrawalFilter";
 
 export function WithdrawalsTable() {
   const [withdrawals, setWithdrawals] = useState<Withdrawal[]>([]);
@@ -101,22 +100,7 @@ export function WithdrawalsTable() {
     }
   };
 
-  const handleFilter = (filters: WithdrawalFilterDTO) => {
-    const filtered = withdrawals.filter((w) => {
-      const matchEmployee =
-        !filters.employee_id || w.employee_id === filters.employee_id;
-
-      const withdrawalDate = new Date(w.date);
-      const matchStartDate =
-        !filters.startDate || withdrawalDate >= new Date(filters.startDate);
-      const matchEndDate =
-        !filters.endDate || withdrawalDate <= new Date(filters.endDate);
-
-      return matchEmployee && matchStartDate && matchEndDate;
-    });
-
-    setFilteredWithdrawals(filtered);
-  };
+  
 
   if (loading) return <TableSkeleton columns={8} />;
 
@@ -133,7 +117,6 @@ export function WithdrawalsTable() {
       >
         <TbCashRegister size={18} />
       </Button>
-        <WithdrawalFilter employees={employees} onFilter={handleFilter} />
 
       </Group>
 
