@@ -1,5 +1,4 @@
 // app/tables/page.tsx
-import { AttendanceTable } from "@/components/HR/Attendance/Table";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { CustomersTable } from "@/components/Customers/Table";
 import { Metadata } from "next";
@@ -15,7 +14,7 @@ export default async function AttendancePage() {
       <Breadcrumb pageName="الدوام اليومي" />
 
       <div className="space-y-10">
-        <AttendanceTable />
+ 
       </div>
     </>
   );
