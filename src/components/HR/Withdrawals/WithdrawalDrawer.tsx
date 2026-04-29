@@ -5,19 +5,17 @@ import { Drawer, TextInput, NumberInput, Textarea, Button, Select } from "@manti
 import { useEffect, useState } from "react";
 import { Toast } from "@/lib/toast";
 import { Withdrawal, CreateWithdrawalDTO, UpdateWithdrawalDTO } from "@/types/withdrawal";
-import { Employee } from "@/types/employee";
 
 interface WithdrawalDrawerProps {
   opened: boolean;
   onClose: () => void;
   withdrawal?: Withdrawal;
-  employees: Employee[];
   onSubmit: (data: CreateWithdrawalDTO | UpdateWithdrawalDTO) => void;
-}
+} 
 
-export function WithdrawalDrawer({ opened, onClose, withdrawal, onSubmit, employees }: WithdrawalDrawerProps) {
+export function WithdrawalDrawer({ opened, onClose, withdrawal, onSubmit }: WithdrawalDrawerProps) {
   const [form, setForm] = useState<CreateWithdrawalDTO>({
-    employee_id: employees[0]?.id || 0,
+    employee_id: 0,
     amount: 0,
     date: new Date().toISOString().split("T")[0],
     note: "",
@@ -37,13 +35,13 @@ useEffect(() => {
     });
   } else {
     setForm({
-      employee_id: employees[0]?.id || 0,
+      employee_id: 0,
       amount: 0,
       date: new Date().toISOString().split("T")[0],
       note: "",
     });
   }
-}, [withdrawal, opened, employees]);
+}, [withdrawal, opened]);
 
   const handleSubmit = () => {
     if (!form.employee_id || form.amount <= 0 || !form.date) {
@@ -60,7 +58,6 @@ useEffect(() => {
           variant="filled"
           radius="md"
           label="الموظف"
-          data={employees.map(e => ({ value: e.id.toString(), label: e.name }))}
           value={form.employee_id.toString()}
           onChange={(val) => setForm({ ...form, employee_id: Number(val) })}
         />

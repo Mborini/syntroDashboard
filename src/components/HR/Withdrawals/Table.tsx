@@ -8,7 +8,7 @@ import { Toast } from "@/lib/toast";
 import ConfirmModal from "../../Common/ConfirmModal";
 
 import { Withdrawal } from "@/types/withdrawal";
-import { Employee } from "@/types/employee";
+
 import {
   getWithdrawals,
   createWithdrawal,
@@ -16,7 +16,7 @@ import {
   deleteWithdrawal,
 } from "@/services/withdrawalServices";
 import { WithdrawalDrawer } from "./WithdrawalDrawer";
-import { getEmployees } from "@/services/employeeServices";
+
 import { TbCashRegister } from "react-icons/tb";
 import { TableSkeleton } from "@/components/Common/skeleton";
 import { WithdrawalFilter, WithdrawalFilterDTO } from "./WithdrawalFilter";
@@ -26,7 +26,7 @@ export function WithdrawalsTable() {
   const [filteredWithdrawals, setFilteredWithdrawals] = useState<Withdrawal[]>(
     [],
   );
-  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [employees, setEmployees] = useState<{ value: string; label: string }[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [drawerOpened, setDrawerOpened] = useState(false);
@@ -38,25 +38,25 @@ export function WithdrawalsTable() {
     useState<Withdrawal | null>(null);
 
   // تحميل البيانات
-  useEffect(() => {
-    async function loadData() {
-      setLoading(true);
-      try {
-        const [wData, eData] = await Promise.all([
-          getWithdrawals(),
-          getEmployees(),
-        ]);
-        setWithdrawals(wData);
-        setFilteredWithdrawals(wData);
-        setEmployees(eData);
-      } catch (error) {
-        console.error("Failed to fetch data:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadData();
-  }, []);
+  // useEffect(() => {
+  //   async function loadData() {
+  //     setLoading(true);
+  //     try {
+  //       const [wData, eData] = await Promise.all([
+  //         getWithdrawals(),
+         
+  //       ]);
+  //       setWithdrawals(wData);
+  //       setFilteredWithdrawals(wData);
+  //       setEmployees(eData);
+  //     } catch (error) {
+  //       console.error("Failed to fetch data:", error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   }
+  //   loadData();
+  // }, []);
 
   const handleSubmit = async (data: any) => {
     try {
@@ -202,7 +202,7 @@ export function WithdrawalsTable() {
         opened={drawerOpened}
         onClose={() => setDrawerOpened(false)}
         withdrawal={selectedWithdrawal || undefined}
-        employees={employees}
+       
         onSubmit={handleSubmit}
       />
 

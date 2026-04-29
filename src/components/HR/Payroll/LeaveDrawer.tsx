@@ -9,8 +9,7 @@ import {
 } from "@mantine/core";
 import { useState, useEffect } from "react";
 import { Toast } from "@/lib/toast";
-import { Employee } from "@/types/employee";
-import { getEmployees } from "@/services/employeeServices";
+
 import {
   getPayrollByEmployeeAndMonth,
   createPayroll,
@@ -23,7 +22,7 @@ type Props = {
 };
 
 export function PayrollQueryDrawer({ opened, onClose, onSuccess }: Props) {
-  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [employees, setEmployees] = useState<{ id: number; name: string }[]>([]);
   const [employeeId, setEmployeeId] = useState<number | null>(null);
   const [month, setMonth] = useState<string>("");
   const [salary, setSalary] = useState<number | null>(null);
@@ -32,17 +31,17 @@ export function PayrollQueryDrawer({ opened, onClose, onSuccess }: Props) {
   // ✅ حالة اللودينغ الخاصة بزر "استعلم"
   const [queryLoading, setQueryLoading] = useState(false);
 
-  useEffect(() => {
-    async function loadEmployees() {
-      try {
-        const data = await getEmployees();
-        setEmployees(data);
-      } catch (error) {
-        console.error(error);
-      }
-    }
-    loadEmployees();
-  }, []);
+  // useEffect(() => {
+  //   async function loadEmployees() {
+  //     try {
+  //       const data = await getEmployees();
+  //       setEmployees(data);
+  //     } catch (error) {
+  //       console.error(error);
+  //     }
+  //   }
+  //   loadEmployees();
+  // }, []);
 
   const handleQuery = async () => {
     if (!employeeId || !month) {
