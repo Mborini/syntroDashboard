@@ -88,7 +88,13 @@ export const exportReportPDF = async (reportId: any) => {
         ["Plate Number", data.plateNumber],
         [
           "Area",
-          data.subFleet === "منطقة طارق" ? "Tariq Area" : "Jubaiha Area",
+          data.subFleet === "منطقة طارق"
+            ? "Tariq Area"
+            : data.subFleet === "منطقة الجبيهة"
+              ? "Jubeiha Area"
+              : data.subFleet === "منطقة ابو نصير"
+                ? "Abu Nseir Area"
+                : data.subFleet,
         ],
         ["Shift", data.shift || "-"],
         ["Compactor Size", `${data.containerSize} TN`],

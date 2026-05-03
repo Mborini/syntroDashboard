@@ -1,18 +1,11 @@
 import axios from "axios";
 
 async function fetchTrackingFromGAM(tsId, from, to, sessionValue) {
-  console.log("🚀 GAM REQUEST START");
-  console.log("📦 Params:", { tsId, from, to });
-  console.log("🍪 Session exists:", !!sessionValue);
-  console.log("🍪 Session preview:", sessionValue?.slice(0, 50));
-
-  const startTime = Date.now();
-
+  
   try {
     const response = await axios.get(
       "https://gamtracking.amman.jo/Tracking/WasteMangement/Endpoints/ManageGarbageTrucksLive.ashx",
       {
-        timeout: 30000,
         params: {
           from,
           to,
@@ -21,34 +14,30 @@ async function fetchTrackingFromGAM(tsId, from, to, sessionValue) {
         },
         headers: {
           Accept: "application/json, text/javascript, */*; q=0.01",
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
           "X-Requested-With": "XMLHttpRequest",
           Referer:
             "https://gamtracking.amman.jo/Tracking/WasteMangement/MonitorBinsLiftPlaces/MonitorBinsLiftPlaces.aspx",
-          ...(sessionValue ? { Cookie: sessionValue } : {}),
+          Cookie: sessionValue,
         },
-      }
+      },
     );
+    console.log("sessionValue:", sessionValue);
 
-    const duration = Date.now() - startTime;
+    const data = response.data; // ✅ مهم جداً
 
-    console.log("✅ GAM SUCCESS");
-    console.log("⏱ Duration:", duration + "ms");
-    console.log("📊 Response keys:", Object.keys(response.data || {}));
+    const encodedPolyline = data.VehiclePolylines?.[0]?.Polyline;
+    const totalLiftCount = data.TotalLiftCount;
+    const VisitedVehicles = data.VisitedVehicles || [];
 
     return {
-      polyline: response.data?.VehiclePolylines?.[0]?.Polyline,
-      totalLiftCount: response.data?.TotalLiftCount,
-      visitedpoints: response.data?.VisitedVehicles || [],
+      polyline: encodedPolyline,
+      totalLiftCount,
+      visitedpoints: VisitedVehicles,
     };
-
   } catch (err) {
-    const duration = Date.now() - startTime;
-
-    console.log("❌ GAM ERROR");
-    console.log("⏱ Duration:", duration + "ms");
-    console.log("🔴 Status:", err?.response?.status);
-    console.log("📄 Message:", err?.message);
-    console.log("📦 Data:", err?.response?.data);
+    console.error("❌ GAM ERROR:", err?.response?.status, err?.message);
 
     return {
       error: true,
@@ -59,5 +48,4 @@ async function fetchTrackingFromGAM(tsId, from, to, sessionValue) {
     };
   }
 }
-
 export { fetchTrackingFromGAM };

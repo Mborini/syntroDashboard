@@ -58,7 +58,7 @@ export default function ReportChecklist({ onChange }: Props) {
 
   const handleChange = <K extends keyof ChecklistData>(
     key: K,
-    value: ChecklistData[K]
+    value: ChecklistData[K],
   ) => {
     setData((prev) => ({ ...prev, [key]: value }));
   };
@@ -141,11 +141,10 @@ export default function ReportChecklist({ onChange }: Props) {
         {/* FOLLOWED ROUTE */}
         <Radio.Group
           label="Followed route?"
-          value={
-            data.followedRoute === null ? "" : String(data.followedRoute)
-          }
+          value={data.followedRoute === null ? "" : String(data.followedRoute)}
           onChange={(v) => handleChange("followedRoute", v === "true")}
         >
+         
           <Radio value="true" label="Yes" />
           <Radio value="false" label="No" />
         </Radio.Group>
@@ -238,7 +237,7 @@ export default function ReportChecklist({ onChange }: Props) {
               onChange={(e) =>
                 handleChange(
                   "uncollectedBinsApproxCount",
-                  Number(e.currentTarget.value)
+                  Number(e.currentTarget.value),
                 )
               }
             />
