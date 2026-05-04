@@ -23,7 +23,6 @@ async function fetchTrackingFromGAM(tsId, from, to, sessionValue) {
         },
       },
     );
-   console.log("sessionValue from api:", sessionValue);
 
     const data = response.data; // ✅ مهم جداً
 
