@@ -251,6 +251,12 @@ export async function POST(req: NextRequest) {
      */
     let trackingData;
 
+console.log("📦 DATA:", {
+  plateNumber,
+  tsId: vehicleInfo?.ts_id,
+  startTimeApi,
+  endTimeApi,
+});
     try {
       trackingData = await fetchTrackingData(
         vehicleInfo.ts_id,
@@ -258,7 +264,16 @@ export async function POST(req: NextRequest) {
         endTimeApi,
       );
     } catch (err: any) {
-      console.error("❌ TRACKING FAILED:", err.message);
+console.error("❌ TRACKING FAILED FULL =========");
+
+console.error("➡️ STATUS:", err?.response?.status);
+console.error("➡️ STATUS TEXT:", err?.response?.statusText);
+console.error("➡️ DATA:", err?.response?.data);
+console.error("➡️ HEADERS:", err?.response?.headers);
+console.error("➡️ MESSAGE:", err?.message);
+
+console.error("❌ END TRACKING ERROR =========");console.log("🚀 START TRACKING REQUEST");
+
 
       return NextResponse.json({ error: "TRACKING_FAILED" }, { status: 500 });
     }
@@ -522,7 +537,7 @@ s.end_date AS "endDate",
 FROM vehicles v
 JOIN vehicle_daily_summaries s ON v.id = s.vehicle_id
 ORDER BY s.id DESC
-
+limit 15
 
     `;
 

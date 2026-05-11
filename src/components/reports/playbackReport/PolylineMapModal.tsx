@@ -277,45 +277,82 @@ const PolylineMapModal = forwardRef(function PolylineMapModal(
   // -----------------------------
   // VISITED POINTS
   // -----------------------------
-  const renderVisitedPoints = (map: any) => {
-    const mapboxgl = mapboxRef.current;
-    if (!mapboxgl || !map) return;
+const renderVisitedPoints = (map: any) => {
+  if (!map) return;
 
-    visitedMarkersRef.current.forEach((m) => m.remove());
-    visitedMarkersRef.current = [];
+  // احذف القديم
+  if (map.getLayer("visited-layer")) map.removeLayer("visited-layer");
+  if (map.getSource("visited-source")) map.removeSource("visited-source");
 
-    visitedPoints.forEach((p: any, index: number) => {
-      if (p?.Longitude == null || p?.Latitude == null) return;
-
+  const features = visitedPoints
+    .map((p: any, index: number) => {
       const lng = Number(p.Longitude);
       const lat = Number(p.Latitude);
-      if (isNaN(lng) || isNaN(lat)) return;
 
-      const el = document.createElement("div");
-      el.style.cssText = `
-        width:22px;height:22px;border-radius:50%;
-        background:white;border:2px solid #1c7ed6;
-        display:flex;align-items:center;justify-content:center;
-        font-size:11px;font-weight:bold;color:#1c7ed6;
-      `;
-      el.innerText = String(index + 1);
+      if (isNaN(lng) || isNaN(lat)) return null;
 
-      const marker = new mapboxgl.Marker({ element: el })
-        .setLngLat([lng, lat])
-        .addTo(map);
+      return {
+        type: "Feature",
+        properties: {
+          number: index + 1,
+        },
+        geometry: {
+          type: "Point",
+          coordinates: [lng, lat],
+        },
+      };
+    })
+    .filter(Boolean);
 
-      visitedMarkersRef.current.push(marker);
+  map.addSource("visited-source", {
+    type: "geojson",
+    data: {
+      type: "FeatureCollection",
+      features: features,
+    },
+  });
 
-      if (!showVisited) el.style.display = "none";
-    });
-  };
+  // ✅ دائرة
+  map.addLayer({
+    id: "visited-layer",
+    type: "circle",
+    source: "visited-source",
+    paint: {
+      "circle-radius": 10,
+      "circle-color": "#ffffff",
+      "circle-stroke-width": 2,
+      "circle-stroke-color": "#1c7ed6",
+    },
+  });
 
+  // ✅ رقم داخل الدائرة
+  map.addLayer({
+    id: "visited-label",
+    type: "symbol",
+    source: "visited-source",
+    layout: {
+      "text-field": ["get", "number"],
+      "text-size": 10,
+    },
+    paint: {
+      "text-color": "#1c7ed6",
+    },
+  });
+};
   useEffect(() => {
-    visitedMarkersRef.current.forEach((marker) => {
-      const el = marker.getElement();
-      if (el) el.style.display = showVisited ? "flex" : "none";
-    });
-  }, [showVisited]);
+  if (!mapRef.current) return;
+
+  const visibility = showVisited ? "visible" : "none";
+
+  if (mapRef.current.getLayer("visited-layer")) {
+    mapRef.current.setLayoutProperty("visited-layer", "visibility", visibility);
+  }
+
+  if (mapRef.current.getLayer("visited-label")) {
+    mapRef.current.setLayoutProperty("visited-label", "visibility", visibility);
+  }
+}, [showVisited]);
+
   useEffect(() => {
     if (!opened) {
       setChecklistData(null);
@@ -437,7 +474,6 @@ const PolylineMapModal = forwardRef(function PolylineMapModal(
           plateNumber,
         }),
       });
-      console.log("UPLOAD RESPONSE:", uploadRes);
       if (!uploadRes.ok) {
         const errorText = await uploadRes.text();
         console.error("UPLOAD FAILED:", errorText);
@@ -445,7 +481,6 @@ const PolylineMapModal = forwardRef(function PolylineMapModal(
       }
 
       const uploaded = await uploadRes.json();
-      console.log("Cloudinary Uploaded:", uploaded);
 
       if (!uploaded.url || !uploaded.public_id) {
         throw new Error("Cloudinary did not return valid data");
